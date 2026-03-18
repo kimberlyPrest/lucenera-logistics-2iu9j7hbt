@@ -9,48 +9,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      dispatch_logs: {
+      entregas_finalizadas: {
         Row: {
-          contact_index: number | null
-          contact_name: string | null
-          contact_phone: string | null
-          delivered_at: string | null
-          delivery_status: string | null
-          dispatch_id: string
-          error_message: string | null
+          cliente: string
+          codigo_obra: string
+          created_at: string
+          data_entrega_real: string
+          data_solicitacao: string | null
+          endereco: string
+          fotos_urls: string[]
+          gestora_equipe: string | null
           id: string
-          message_id: string | null
-          read_at: string | null
-          sent_at: string | null
-          status: string
+          material_conteudo: string
+          material_tipo: string
+          numero_entrega: string | null
+          numero_pedido: string | null
+          observacoes: string | null
+          observacoes_internas: string | null
+          recebido_por: string
+          separacao_id: string
+          telefone: string
+          vendedor: string | null
         }
         Insert: {
-          contact_index?: number | null
-          contact_name?: string | null
-          contact_phone?: string | null
-          delivered_at?: string | null
-          delivery_status?: string | null
-          dispatch_id: string
-          error_message?: string | null
+          cliente: string
+          codigo_obra: string
+          created_at?: string
+          data_entrega_real?: string
+          data_solicitacao?: string | null
+          endereco: string
+          fotos_urls?: string[]
+          gestora_equipe?: string | null
           id?: string
-          message_id?: string | null
-          read_at?: string | null
-          sent_at?: string | null
-          status: string
+          material_conteudo: string
+          material_tipo: string
+          numero_entrega?: string | null
+          numero_pedido?: string | null
+          observacoes?: string | null
+          observacoes_internas?: string | null
+          recebido_por: string
+          separacao_id: string
+          telefone: string
+          vendedor?: string | null
         }
         Update: {
-          contact_index?: number | null
-          contact_name?: string | null
-          contact_phone?: string | null
-          delivered_at?: string | null
-          delivery_status?: string | null
-          dispatch_id?: string
-          error_message?: string | null
+          cliente?: string
+          codigo_obra?: string
+          created_at?: string
+          data_entrega_real?: string
+          data_solicitacao?: string | null
+          endereco?: string
+          fotos_urls?: string[]
+          gestora_equipe?: string | null
           id?: string
-          message_id?: string | null
-          read_at?: string | null
-          sent_at?: string | null
-          status?: string
+          material_conteudo?: string
+          material_tipo?: string
+          numero_entrega?: string | null
+          numero_pedido?: string | null
+          observacoes?: string | null
+          observacoes_internas?: string | null
+          recebido_por?: string
+          separacao_id?: string
+          telefone?: string
+          vendedor?: string | null
         }
         Relationships: [
           {
@@ -62,13 +83,16 @@ export type Database = {
           },
         ]
       }
-      dispatches: {
+      entregas_pendentes: {
         Row: {
-          approved_variations: Json | null
-          contacts_json: Json | null
+          cliente: string
+          codigo_obra: string
           created_at: string | null
-          error_count: number | null
-          finished_at: string | null
+          data_registro: string | null
+          descricao_problema: string
+          endereco: string | null
+          fotos_resolucao: string[] | null
+          fotos_urls: string[] | null
           id: string
           instance_distribution: Json | null
           is_multi_instance: boolean | null
@@ -156,52 +180,51 @@ export type Database = {
           produto: string | null
           raw_payload: Json | null
           telefone: string | null
-          updated_at: string | null
-          user_id: string | null
+          tipo_problema: string
         }
         Insert: {
+          cliente: string
+          codigo_obra: string
           created_at?: string | null
-          csat_reuniao_1?: string | null
-          csat_reuniao_2?: string | null
-          csat_reuniao_3?: string | null
-          data_etapa_atual?: string | null
-          data_reuniao_1?: string | null
-          data_reuniao_2?: string | null
-          data_reuniao_3?: string | null
-          email?: string | null
-          etapa_negocio?: string | null
-          hubspot_id?: string | null
+          data_registro?: string | null
+          descricao_problema: string
+          endereco?: string | null
+          fotos_resolucao?: string[] | null
+          fotos_urls?: string[] | null
           id?: string
-          nome?: string | null
-          numero_consultoria?: string | null
-          primeiro_nome?: string | null
-          produto?: string | null
-          raw_payload?: Json | null
+          observacoes_resolucao?: string | null
+          registrado_por: string
+          registrado_por_user_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          resolved_by_user_id?: string | null
+          responsavel?: string | null
+          separacao_id: string
+          status_pendencia?: string | null
           telefone?: string | null
-          updated_at?: string | null
-          user_id?: string | null
+          tipo_problema: string
         }
         Update: {
+          cliente?: string
+          codigo_obra?: string
           created_at?: string | null
-          csat_reuniao_1?: string | null
-          csat_reuniao_2?: string | null
-          csat_reuniao_3?: string | null
-          data_etapa_atual?: string | null
-          data_reuniao_1?: string | null
-          data_reuniao_2?: string | null
-          data_reuniao_3?: string | null
-          email?: string | null
-          etapa_negocio?: string | null
-          hubspot_id?: string | null
+          data_registro?: string | null
+          descricao_problema?: string
+          endereco?: string | null
+          fotos_resolucao?: string[] | null
+          fotos_urls?: string[] | null
           id?: string
-          nome?: string | null
-          numero_consultoria?: string | null
-          primeiro_nome?: string | null
-          produto?: string | null
-          raw_payload?: Json | null
+          observacoes_resolucao?: string | null
+          registrado_por?: string
+          registrado_por_user_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          resolved_by_user_id?: string | null
+          responsavel?: string | null
+          separacao_id?: string
+          status_pendencia?: string | null
           telefone?: string | null
-          updated_at?: string | null
-          user_id?: string | null
+          tipo_problema?: string
         }
         Relationships: [
           {
@@ -213,105 +236,36 @@ export type Database = {
           },
         ]
       }
-      owner_mapping: {
+      separacao_arquivos: {
         Row: {
-          adapta_email: string
-          adapta_user_id: string | null
-          created_at: string | null
-          hubspot_owner_id: string
+          created_at: string
           id: string
-          nome: string | null
-          role: string
+          nome_arquivo: string
+          ordem: number
+          separacao_id: string
+          tamanho_bytes: number
+          tipo_arquivo: string
+          url_arquivo: string
         }
         Insert: {
-          adapta_email: string
-          adapta_user_id?: string | null
-          created_at?: string | null
-          hubspot_owner_id: string
+          created_at?: string
           id?: string
-          nome?: string | null
-          role?: string
+          nome_arquivo: string
+          ordem?: number
+          separacao_id: string
+          tamanho_bytes: number
+          tipo_arquivo: string
+          url_arquivo: string
         }
         Update: {
-          adapta_email?: string
-          adapta_user_id?: string | null
-          created_at?: string | null
-          hubspot_owner_id?: string
+          created_at?: string
           id?: string
-          nome?: string | null
-          role?: string
-        }
-        Relationships: []
-      }
-      scheduled_dispatches: {
-        Row: {
-          contacts_json: Json
-          created_at: string | null
-          dispatch_id: string | null
-          dispatch_type: string | null
-          id: string
-          lot_config: Json | null
-          scheduled_at: string
-          status: string | null
-          template: string
-          user_id: string
-        }
-        Insert: {
-          contacts_json: Json
-          created_at?: string | null
-          dispatch_id?: string | null
-          dispatch_type?: string | null
-          id?: string
-          lot_config?: Json | null
-          scheduled_at: string
-          status?: string | null
-          template: string
-          user_id: string
-        }
-        Update: {
-          contacts_json?: Json
-          created_at?: string | null
-          dispatch_id?: string | null
-          dispatch_type?: string | null
-          id?: string
-          lot_config?: Json | null
-          scheduled_at?: string
-          status?: string | null
-          template?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_credentials: {
-        Row: {
-          created_at: string | null
-          evolution_api_key: string | null
-          evolution_api_url: string | null
-          google_credentials: Json | null
-          id: string
-          instance_name: string | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          evolution_api_key?: string | null
-          evolution_api_url?: string | null
-          google_credentials?: Json | null
-          id?: string
-          instance_name?: string | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          evolution_api_key?: string | null
-          evolution_api_url?: string | null
-          google_credentials?: Json | null
-          id?: string
-          instance_name?: string | null
-          updated_at?: string | null
-          user_id?: string
+          nome_arquivo?: string
+          ordem?: number
+          separacao_id?: string
+          tamanho_bytes?: number
+          tipo_arquivo?: string
+          url_arquivo?: string
         }
         Relationships: [
           {
@@ -323,51 +277,185 @@ export type Database = {
           },
         ]
       }
-      whatsapp_instances: {
+      separacao_itens: {
         Row: {
-          api_key: string
-          api_url: string
-          created_at: string | null
-          display_name: string | null
+          codigo_produto: string
+          created_at: string
+          descricao: string
           id: string
-          instance_name: string
-          is_active: boolean
-          phone_number: string | null
-          provider: string
-          status: string
-          updated_at: string | null
-          user_id: string
-          webhook_configured: boolean | null
+          id_lote: string | null
+          local: string | null
+          marca: string | null
+          ordem: number
+          quantidade: number
+          referencia: string
+          separacao_id: string
         }
         Insert: {
-          api_key: string
-          api_url: string
-          created_at?: string | null
-          display_name?: string | null
+          codigo_produto: string
+          created_at?: string
+          descricao: string
           id?: string
-          instance_name: string
-          is_active?: boolean
-          phone_number?: string | null
-          provider?: string
-          status?: string
-          updated_at?: string | null
-          user_id: string
-          webhook_configured?: boolean | null
+          id_lote?: string | null
+          local?: string | null
+          marca?: string | null
+          ordem?: number
+          quantidade: number
+          referencia: string
+          separacao_id: string
         }
         Update: {
-          api_key?: string
-          api_url?: string
-          created_at?: string | null
-          display_name?: string | null
+          codigo_produto?: string
+          created_at?: string
+          descricao?: string
           id?: string
-          instance_name?: string
-          is_active?: boolean
-          phone_number?: string | null
-          provider?: string
+          id_lote?: string | null
+          local?: string | null
+          marca?: string | null
+          ordem?: number
+          quantidade?: number
+          referencia?: string
+          separacao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "separacao_itens_separacao_id_fkey"
+            columns: ["separacao_id"]
+            isOneToOne: false
+            referencedRelation: "separacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      separacoes: {
+        Row: {
+          cliente: string
+          codigo_obra: string
+          codigo_rastreamento: string | null
+          created_at: string
+          data_entrega: string
+          data_inicio_separacao: string | null
+          delivery_type: string
+          endereco: string
+          garantia_detalhes: string | null
+          garantia_motivo: string | null
+          garantia_peca: string | null
+          gestora_equipe: string
+          id: string
+          inclui_garantia: boolean
+          material_conteudo: string
+          material_tipo: string | null
+          nivel_complexidade: string | null
+          numero_entrega: string | null
+          numero_venda: string[]
+          observacoes_internas: string | null
+          order_in_route: number | null
+          responsavel_recebimento: string
+          scheduled_time: string | null
+          separacoes_parciais: string[] | null
+          solicitante: string | null
+          status: string
+          telefone: string | null
+          tipo_entrega: string | null
+          tipo_pedido: string
+          transportadora_nome: string | null
+          updated_at: string
+        }
+        Insert: {
+          cliente: string
+          codigo_obra: string
+          codigo_rastreamento?: string | null
+          created_at?: string
+          data_entrega: string
+          data_inicio_separacao?: string | null
+          delivery_type?: string
+          endereco: string
+          garantia_detalhes?: string | null
+          garantia_motivo?: string | null
+          garantia_peca?: string | null
+          gestora_equipe: string
+          id?: string
+          inclui_garantia?: boolean
+          material_conteudo: string
+          material_tipo?: string | null
+          nivel_complexidade?: string | null
+          numero_entrega?: string | null
+          numero_venda?: string[]
+          observacoes_internas?: string | null
+          order_in_route?: number | null
+          responsavel_recebimento: string
+          scheduled_time?: string | null
+          separacoes_parciais?: string[] | null
+          solicitante?: string | null
           status?: string
+          telefone?: string | null
+          tipo_entrega?: string | null
+          tipo_pedido?: string
+          transportadora_nome?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cliente?: string
+          codigo_obra?: string
+          codigo_rastreamento?: string | null
+          created_at?: string
+          data_entrega?: string
+          data_inicio_separacao?: string | null
+          delivery_type?: string
+          endereco?: string
+          garantia_detalhes?: string | null
+          garantia_motivo?: string | null
+          garantia_peca?: string | null
+          gestora_equipe?: string
+          id?: string
+          inclui_garantia?: boolean
+          material_conteudo?: string
+          material_tipo?: string | null
+          nivel_complexidade?: string | null
+          numero_entrega?: string | null
+          numero_venda?: string[]
+          observacoes_internas?: string | null
+          order_in_route?: number | null
+          responsavel_recebimento?: string
+          scheduled_time?: string | null
+          separacoes_parciais?: string[] | null
+          solicitante?: string | null
+          status?: string
+          telefone?: string | null
+          tipo_entrega?: string | null
+          tipo_pedido?: string
+          transportadora_nome?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          nome_completo: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          nome_completo?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          nome_completo?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string | null
           user_id?: string
-          webhook_configured?: boolean | null
         }
         Relationships: [
           {
@@ -381,27 +469,20 @@ export type Database = {
       }
     }
     Views: {
-      auth_users_view: {
-        Row: {
-          email: string | null
-          id: string | null
-        }
-        Insert: {
-          email?: string | null
-          id?: string | null
-        }
-        Update: {
-          email?: string | null
-          id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_authenticated: { Args: never; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user" | "entregador"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -526,7 +607,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user", "entregador"],
+    },
   },
 } as const
 
