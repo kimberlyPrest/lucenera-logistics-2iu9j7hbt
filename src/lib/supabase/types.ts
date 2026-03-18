@@ -1,98 +1,80 @@
 // AVOID UPDATING THIS FILE DIRECTLY. It is automatically generated.
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: '14.4'
+    PostgrestVersion: "14.4"
   }
   public: {
     Tables: {
-      entregas_finalizadas: {
+      dispatch_logs: {
         Row: {
-          cliente: string
-          codigo_obra: string
-          created_at: string
-          data_entrega_real: string
-          data_solicitacao: string | null
-          endereco: string
-          fotos_urls: string[]
-          gestora_equipe: string | null
+          contact_index: number | null
+          contact_name: string | null
+          contact_phone: string | null
+          delivered_at: string | null
+          delivery_status: string | null
+          dispatch_id: string
+          error_message: string | null
           id: string
-          material_conteudo: string
-          material_tipo: string
-          numero_entrega: string | null
-          numero_pedido: string | null
-          observacoes: string | null
-          observacoes_internas: string | null
-          recebido_por: string
-          separacao_id: string
-          telefone: string
-          vendedor: string | null
+          message_id: string | null
+          read_at: string | null
+          sent_at: string | null
+          status: string
         }
         Insert: {
-          cliente: string
-          codigo_obra: string
-          created_at?: string
-          data_entrega_real?: string
-          data_solicitacao?: string | null
-          endereco: string
-          fotos_urls?: string[]
-          gestora_equipe?: string | null
+          contact_index?: number | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          delivered_at?: string | null
+          delivery_status?: string | null
+          dispatch_id: string
+          error_message?: string | null
           id?: string
-          material_conteudo: string
-          material_tipo: string
-          numero_entrega?: string | null
-          numero_pedido?: string | null
-          observacoes?: string | null
-          observacoes_internas?: string | null
-          recebido_por: string
-          separacao_id: string
-          telefone: string
-          vendedor?: string | null
+          message_id?: string | null
+          read_at?: string | null
+          sent_at?: string | null
+          status: string
         }
         Update: {
-          cliente?: string
-          codigo_obra?: string
-          created_at?: string
-          data_entrega_real?: string
-          data_solicitacao?: string | null
-          endereco?: string
-          fotos_urls?: string[]
-          gestora_equipe?: string | null
+          contact_index?: number | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          delivered_at?: string | null
+          delivery_status?: string | null
+          dispatch_id?: string
+          error_message?: string | null
           id?: string
-          material_conteudo?: string
-          material_tipo?: string
-          numero_entrega?: string | null
-          numero_pedido?: string | null
-          observacoes?: string | null
-          observacoes_internas?: string | null
-          recebido_por?: string
-          separacao_id?: string
-          telefone?: string
-          vendedor?: string | null
+          message_id?: string | null
+          read_at?: string | null
+          sent_at?: string | null
+          status?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'dispatch_logs_dispatch_id_fkey'
-            columns: ['dispatch_id']
+            foreignKeyName: "dispatch_logs_dispatch_id_fkey"
+            columns: ["dispatch_id"]
             isOneToOne: false
-            referencedRelation: 'dispatches'
-            referencedColumns: ['id']
+            referencedRelation: "dispatches"
+            referencedColumns: ["id"]
           },
         ]
       }
-      entregas_pendentes: {
+      dispatches: {
         Row: {
-          cliente: string
-          codigo_obra: string
+          approved_variations: Json | null
+          contacts_json: Json | null
           created_at: string | null
-          data_registro: string | null
-          descricao_problema: string
-          endereco: string | null
-          fotos_resolucao: string[] | null
-          fotos_urls: string[] | null
+          error_count: number | null
+          finished_at: string | null
           id: string
           instance_distribution: Json | null
           is_multi_instance: boolean | null
@@ -152,11 +134,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'dispatches_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "dispatches_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'auth_users_view'
-            referencedColumns: ['id']
+            referencedRelation: "auth_users_view"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -180,309 +162,252 @@ export type Database = {
           produto: string | null
           raw_payload: Json | null
           telefone: string | null
-          tipo_problema: string
+          updated_at: string | null
+          user_id: string | null
         }
         Insert: {
-          cliente: string
-          codigo_obra: string
           created_at?: string | null
-          data_registro?: string | null
-          descricao_problema: string
-          endereco?: string | null
-          fotos_resolucao?: string[] | null
-          fotos_urls?: string[] | null
+          csat_reuniao_1?: string | null
+          csat_reuniao_2?: string | null
+          csat_reuniao_3?: string | null
+          data_etapa_atual?: string | null
+          data_reuniao_1?: string | null
+          data_reuniao_2?: string | null
+          data_reuniao_3?: string | null
+          email?: string | null
+          etapa_negocio?: string | null
+          hubspot_id?: string | null
           id?: string
-          observacoes_resolucao?: string | null
-          registrado_por: string
-          registrado_por_user_id?: string | null
-          resolved_at?: string | null
-          resolved_by?: string | null
-          resolved_by_user_id?: string | null
-          responsavel?: string | null
-          separacao_id: string
-          status_pendencia?: string | null
+          nome?: string | null
+          numero_consultoria?: string | null
+          primeiro_nome?: string | null
+          produto?: string | null
+          raw_payload?: Json | null
           telefone?: string | null
-          tipo_problema: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
-          cliente?: string
-          codigo_obra?: string
           created_at?: string | null
-          data_registro?: string | null
-          descricao_problema?: string
-          endereco?: string | null
-          fotos_resolucao?: string[] | null
-          fotos_urls?: string[] | null
+          csat_reuniao_1?: string | null
+          csat_reuniao_2?: string | null
+          csat_reuniao_3?: string | null
+          data_etapa_atual?: string | null
+          data_reuniao_1?: string | null
+          data_reuniao_2?: string | null
+          data_reuniao_3?: string | null
+          email?: string | null
+          etapa_negocio?: string | null
+          hubspot_id?: string | null
           id?: string
-          observacoes_resolucao?: string | null
-          registrado_por?: string
-          registrado_por_user_id?: string | null
-          resolved_at?: string | null
-          resolved_by?: string | null
-          resolved_by_user_id?: string | null
-          responsavel?: string | null
-          separacao_id?: string
-          status_pendencia?: string | null
+          nome?: string | null
+          numero_consultoria?: string | null
+          primeiro_nome?: string | null
+          produto?: string | null
+          raw_payload?: Json | null
           telefone?: string | null
-          tipo_problema?: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: 'hubspot_contacts_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "hubspot_contacts_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'auth_users_view'
-            referencedColumns: ['id']
+            referencedRelation: "auth_users_view"
+            referencedColumns: ["id"]
           },
         ]
       }
-      separacao_arquivos: {
+      owner_mapping: {
         Row: {
-          created_at: string
+          adapta_email: string
+          adapta_user_id: string | null
+          created_at: string | null
+          hubspot_owner_id: string
           id: string
-          nome_arquivo: string
-          ordem: number
-          separacao_id: string
-          tamanho_bytes: number
-          tipo_arquivo: string
-          url_arquivo: string
+          nome: string | null
+          role: string
         }
         Insert: {
-          created_at?: string
+          adapta_email: string
+          adapta_user_id?: string | null
+          created_at?: string | null
+          hubspot_owner_id: string
           id?: string
-          nome_arquivo: string
-          ordem?: number
-          separacao_id: string
-          tamanho_bytes: number
-          tipo_arquivo: string
-          url_arquivo: string
+          nome?: string | null
+          role?: string
         }
         Update: {
-          created_at?: string
+          adapta_email?: string
+          adapta_user_id?: string | null
+          created_at?: string | null
+          hubspot_owner_id?: string
           id?: string
-          nome_arquivo?: string
-          ordem?: number
-          separacao_id?: string
-          tamanho_bytes?: number
-          tipo_arquivo?: string
-          url_arquivo?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: 'user_credentials_user_id_fkey'
-            columns: ['user_id']
-            isOneToOne: true
-            referencedRelation: 'auth_users_view'
-            referencedColumns: ['id']
-          },
-        ]
-      }
-      separacao_itens: {
-        Row: {
-          codigo_produto: string
-          created_at: string
-          descricao: string
-          id: string
-          id_lote: string | null
-          local: string | null
-          marca: string | null
-          ordem: number
-          quantidade: number
-          referencia: string
-          separacao_id: string
-        }
-        Insert: {
-          codigo_produto: string
-          created_at?: string
-          descricao: string
-          id?: string
-          id_lote?: string | null
-          local?: string | null
-          marca?: string | null
-          ordem?: number
-          quantidade: number
-          referencia: string
-          separacao_id: string
-        }
-        Update: {
-          codigo_produto?: string
-          created_at?: string
-          descricao?: string
-          id?: string
-          id_lote?: string | null
-          local?: string | null
-          marca?: string | null
-          ordem?: number
-          quantidade?: number
-          referencia?: string
-          separacao_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: 'separacao_itens_separacao_id_fkey'
-            columns: ['separacao_id']
-            isOneToOne: false
-            referencedRelation: 'separacoes'
-            referencedColumns: ['id']
-          },
-        ]
-      }
-      separacoes: {
-        Row: {
-          cliente: string
-          codigo_obra: string
-          codigo_rastreamento: string | null
-          created_at: string
-          data_entrega: string
-          data_inicio_separacao: string | null
-          delivery_type: string
-          endereco: string
-          garantia_detalhes: string | null
-          garantia_motivo: string | null
-          garantia_peca: string | null
-          gestora_equipe: string
-          id: string
-          inclui_garantia: boolean
-          material_conteudo: string
-          material_tipo: string | null
-          nivel_complexidade: string | null
-          numero_entrega: string | null
-          numero_venda: string[]
-          observacoes_internas: string | null
-          order_in_route: number | null
-          responsavel_recebimento: string
-          scheduled_time: string | null
-          separacoes_parciais: string[] | null
-          solicitante: string | null
-          status: string
-          telefone: string | null
-          tipo_entrega: string | null
-          tipo_pedido: string
-          transportadora_nome: string | null
-          updated_at: string
-        }
-        Insert: {
-          cliente: string
-          codigo_obra: string
-          codigo_rastreamento?: string | null
-          created_at?: string
-          data_entrega: string
-          data_inicio_separacao?: string | null
-          delivery_type?: string
-          endereco: string
-          garantia_detalhes?: string | null
-          garantia_motivo?: string | null
-          garantia_peca?: string | null
-          gestora_equipe: string
-          id?: string
-          inclui_garantia?: boolean
-          material_conteudo: string
-          material_tipo?: string | null
-          nivel_complexidade?: string | null
-          numero_entrega?: string | null
-          numero_venda?: string[]
-          observacoes_internas?: string | null
-          order_in_route?: number | null
-          responsavel_recebimento: string
-          scheduled_time?: string | null
-          separacoes_parciais?: string[] | null
-          solicitante?: string | null
-          status?: string
-          telefone?: string | null
-          tipo_entrega?: string | null
-          tipo_pedido?: string
-          transportadora_nome?: string | null
-          updated_at?: string
-        }
-        Update: {
-          cliente?: string
-          codigo_obra?: string
-          codigo_rastreamento?: string | null
-          created_at?: string
-          data_entrega?: string
-          data_inicio_separacao?: string | null
-          delivery_type?: string
-          endereco?: string
-          garantia_detalhes?: string | null
-          garantia_motivo?: string | null
-          garantia_peca?: string | null
-          gestora_equipe?: string
-          id?: string
-          inclui_garantia?: boolean
-          material_conteudo?: string
-          material_tipo?: string | null
-          nivel_complexidade?: string | null
-          numero_entrega?: string | null
-          numero_venda?: string[]
-          observacoes_internas?: string | null
-          order_in_route?: number | null
-          responsavel_recebimento?: string
-          scheduled_time?: string | null
-          separacoes_parciais?: string[] | null
-          solicitante?: string | null
-          status?: string
-          telefone?: string | null
-          tipo_entrega?: string | null
-          tipo_pedido?: string
-          transportadora_nome?: string | null
-          updated_at?: string
+          nome?: string | null
+          role?: string
         }
         Relationships: []
       }
-      user_roles: {
+      scheduled_dispatches: {
+        Row: {
+          contacts_json: Json
+          created_at: string | null
+          dispatch_id: string | null
+          dispatch_type: string | null
+          id: string
+          lot_config: Json | null
+          scheduled_at: string
+          status: string | null
+          template: string
+          user_id: string
+        }
+        Insert: {
+          contacts_json: Json
+          created_at?: string | null
+          dispatch_id?: string | null
+          dispatch_type?: string | null
+          id?: string
+          lot_config?: Json | null
+          scheduled_at: string
+          status?: string | null
+          template: string
+          user_id: string
+        }
+        Update: {
+          contacts_json?: Json
+          created_at?: string | null
+          dispatch_id?: string | null
+          dispatch_type?: string | null
+          id?: string
+          lot_config?: Json | null
+          scheduled_at?: string
+          status?: string | null
+          template?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_credentials: {
         Row: {
           created_at: string | null
-          email: string
+          evolution_api_key: string | null
+          evolution_api_url: string | null
+          google_credentials: Json | null
           id: string
-          nome_completo: string | null
-          role: Database['public']['Enums']['app_role']
+          instance_name: string | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
-          email: string
+          evolution_api_key?: string | null
+          evolution_api_url?: string | null
+          google_credentials?: Json | null
           id?: string
-          nome_completo?: string | null
-          role?: Database['public']['Enums']['app_role']
+          instance_name?: string | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
-          email?: string
+          evolution_api_key?: string | null
+          evolution_api_url?: string | null
+          google_credentials?: Json | null
           id?: string
-          nome_completo?: string | null
-          role?: Database['public']['Enums']['app_role']
+          instance_name?: string | null
           updated_at?: string | null
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'whatsapp_instances_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "user_credentials_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "auth_users_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_instances: {
+        Row: {
+          api_key: string
+          api_url: string
+          created_at: string | null
+          display_name: string | null
+          id: string
+          instance_name: string
+          is_active: boolean
+          phone_number: string | null
+          provider: string
+          status: string
+          updated_at: string | null
+          user_id: string
+          webhook_configured: boolean | null
+        }
+        Insert: {
+          api_key: string
+          api_url: string
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          instance_name: string
+          is_active?: boolean
+          phone_number?: string | null
+          provider?: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+          webhook_configured?: boolean | null
+        }
+        Update: {
+          api_key?: string
+          api_url?: string
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          instance_name?: string
+          is_active?: boolean
+          phone_number?: string | null
+          provider?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+          webhook_configured?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_instances_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'auth_users_view'
-            referencedColumns: ['id']
+            referencedRelation: "auth_users_view"
+            referencedColumns: ["id"]
           },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      auth_users_view: {
+        Row: {
+          email: string | null
+          id: string | null
+        }
+        Insert: {
+          email?: string | null
+          id?: string | null
+        }
+        Update: {
+          email?: string | null
+          id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database['public']['Enums']['app_role']
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      is_authenticated: { Args: never; Returns: boolean }
+      [_ in never]: never
     }
     Enums: {
-      app_role: 'admin' | 'user' | 'entregador'
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -490,31 +415,33 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -523,23 +450,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -548,23 +475,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -573,45 +500,44 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema['Enums']
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema['CompositeTypes']
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ['admin', 'user', 'entregador'],
-    },
+    Enums: {},
   },
 } as const
+
 
 // ====== DATABASE EXTENDED CONTEXT (auto-generated) ======
 // This section contains actual PostgreSQL column types, constraints, RLS policies,
@@ -805,3 +731,4 @@ export const Constants = {
 //   CREATE UNIQUE INDEX user_credentials_user_id_key ON public.user_credentials USING btree (user_id)
 // Table: whatsapp_instances
 //   CREATE INDEX idx_whatsapp_instances_user ON public.whatsapp_instances USING btree (user_id)
+
