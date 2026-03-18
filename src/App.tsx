@@ -1,28 +1,28 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { AdminRoute } from "@/components/auth/AdminRoute";
-import { EntregadorRoute } from "@/components/auth/EntregadorRoute";
-import LoginPage from "./pages/LoginPage";
-import SeparacaoPage from "./pages/SeparacaoPage";
-import CalendarioPage from "./pages/CalendarioPage";
-import RegistrarEntregaPage from "./pages/RegistrarEntregaPage";
-import EntregasFinalizadasPage from "./pages/EntregasFinalizadasPage";
-import PendentesPage from "./pages/PendentesPage";
-import RouteOptimizerPage from "./pages/RouteOptimizerPage";
-import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
-import AdminUsersPage from "./pages/admin/AdminUsersPage";
-import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
-import AdminDevPage from "./pages/admin/AdminDevPage";
-import AdminLogsPage from "./pages/admin/AdminLogsPage";
-import NotFound from "./pages/NotFound";
-import { SmartRedirect } from "@/components/auth/SmartRedirect";
+import { Toaster } from '@/components/ui/toaster'
+import { Toaster as Sonner } from '@/components/ui/sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider } from '@/contexts/AuthContext'
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
+import { AdminRoute } from '@/components/auth/AdminRoute'
+import { EntregadorRoute } from '@/components/auth/EntregadorRoute'
+import LoginPage from './pages/LoginPage'
+import SeparacaoPage from './pages/SeparacaoPage'
+import CalendarioPage from './pages/CalendarioPage'
+import RegistrarEntregaPage from './pages/RegistrarEntregaPage'
+import EntregasFinalizadasPage from './pages/EntregasFinalizadasPage'
+import PendentesPage from './pages/PendentesPage'
+import RouteOptimizerPage from './pages/RouteOptimizerPage'
+import AdminDashboardPage from './pages/admin/AdminDashboardPage'
+import AdminUsersPage from './pages/admin/AdminUsersPage'
+import AdminSettingsPage from './pages/admin/AdminSettingsPage'
+import AdminDevPage from './pages/admin/AdminDevPage'
+import AdminLogsPage from './pages/admin/AdminLogsPage'
+import NotFound from './pages/NotFound'
+import { SmartRedirect } from '@/components/auth/SmartRedirect'
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -36,7 +36,14 @@ const App = () => (
             <Route path="/login" element={<LoginPage />} />
 
             {/* Protected routes */}
-            <Route path="/" element={<ProtectedRoute><SmartRedirect /></ProtectedRoute>} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <SmartRedirect />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/separacao"
               element={
@@ -135,6 +142,6 @@ const App = () => (
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
-);
+)
 
-export default App;
+export default App

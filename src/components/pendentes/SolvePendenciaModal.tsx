@@ -1,38 +1,43 @@
-import { useState } from 'react';
-import { CheckCircle2, X, Camera, Loader2, AlertTriangle } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
-import { EntregaPendente } from '@/types/separacao';
+import { useState } from 'react'
+import { CheckCircle2, X, Camera, Loader2, AlertTriangle } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { supabase } from '@/integrations/supabase/client'
+import { useToast } from '@/hooks/use-toast'
+import { useAuth } from '@/contexts/AuthContext'
+import { EntregaPendente } from '@/types/separacao'
 
 interface SolvePendenciaModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  pendencia: EntregaPendente;
-  onSuccess: () => void;
+  isOpen: boolean
+  onClose: () => void
+  pendencia: EntregaPendente
+  onSuccess: () => void
 }
 
-export function SolvePendenciaModal({ isOpen, onClose, pendencia, onSuccess }: SolvePendenciaModalProps) {
-  const [fotos, setFotos] = useState<File[]>([]);
-  const [observacoes, setObservacoes] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-  const { user } = useAuth();
+export function SolvePendenciaModal({
+  isOpen,
+  onClose,
+  pendencia,
+  onSuccess,
+}: SolvePendenciaModalProps) {
+  const [fotos, setFotos] = useState<File[]>([])
+  const [observacoes, setObservacoes] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { toast } = useToast()
+  const { user } = useAuth()
 
   const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      setFotos(prev => [...prev, ...newFiles].slice(0, 5));
+      const newFiles = Array.from(e.target.files)
+      setFotos((prev) => [...prev, ...newFiles].slice(0, 5))
     }
-  };
+  }
 
   const removeFoto = (index: number) => {
-    setFotos(prev => prev.filter((_, i) => i !== index));
-  };
+    setFotos((prev) => prev.filter((_, i) => i !== index))
+  }
 
   const handleSubmit = async () => {
     if (observacoes.trim().length < 10) {
@@ -40,30 +45,28 @@ export function SolvePendenciaModal({ isOpen, onClose, pendencia, onSuccess }: S
         title: 'Observação muito curta',
         description: 'Descreva o que foi feito para resolver a pendência (mínimo 10 caracteres).',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
     try {
       // Upload fotos de resolução
-      const fotosUrls: string[] = [];
+      const fotosUrls: string[] = []
       for (let i = 0; i < fotos.length; i++) {
-        const foto = fotos[i];
-        const timestamp = Date.now();
-        const extension = foto.name.split('.').pop() || 'jpg';
-        const filePath = `resolucoes/${pendencia.codigo_obra}/${timestamp}_${i}.${extension}`;
+        const foto = fotos[i]
+        const timestamp = Date.now()
+        const extension = foto.name.split('.').pop() || 'jpg'
+        const filePath = `resolucoes/${pendencia.codigo_obra}/${timestamp}_${i}.${extension}`
 
         const { error: uploadError } = await supabase.storage
           .from('entregas-fotos')
-          .upload(filePath, foto);
+          .upload(filePath, foto)
 
         if (!uploadError) {
-          const { data: urlData } = supabase.storage
-            .from('entregas-fotos')
-            .getPublicUrl(filePath);
-          fotosUrls.push(urlData.publicUrl);
+          const { data: urlData } = supabase.storage.from('entregas-fotos').getPublicUrl(filePath)
+          fotosUrls.push(urlData.publicUrl)
         }
       }
 
@@ -77,44 +80,44 @@ export function SolvePendenciaModal({ isOpen, onClose, pendencia, onSuccess }: S
           fotos_resolucao: fotosUrls,
           observacoes_resolucao: observacoes.trim(),
         } as Record<string, unknown>)
-        .eq('id', pendencia.id);
+        .eq('id', pendencia.id)
 
-      if (updateError) throw updateError;
+      if (updateError) throw updateError
 
       toast({
         title: '✅ Pendência resolvida!',
         description: 'A resolução foi registrada. A entrega segue em acompanhamento.',
         className: 'bg-success text-success-foreground border-none',
-      });
+      })
 
-      onSuccess();
-      onClose();
-      resetForm();
+      onSuccess()
+      onClose()
+      resetForm()
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Erro ao resolver pendência';
+      const message = err instanceof Error ? err.message : 'Erro ao resolver pendência'
       toast({
         title: 'Erro ao registrar resolução',
         description: message,
         variant: 'destructive',
-      });
+      })
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const resetForm = () => {
-    setFotos([]);
-    setObservacoes('');
-  };
+    setFotos([])
+    setObservacoes('')
+  }
 
   const handleClose = () => {
     if (!isSubmitting) {
-      resetForm();
-      onClose();
+      resetForm()
+      onClose()
     }
-  };
+  }
 
-  const isValid = observacoes.trim().length >= 10;
+  const isValid = observacoes.trim().length >= 10
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -132,8 +135,12 @@ export function SolvePendenciaModal({ isOpen, onClose, pendencia, onSuccess }: S
         <div className="p-6 space-y-6">
           {/* Resumo da pendência */}
           <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-            <p className="text-xs font-semibold text-destructive uppercase mb-1">Problema Registrado</p>
-            <p className="text-sm font-medium text-destructive">{pendencia.tipo_problema.replace(/_/g, ' ')}</p>
+            <p className="text-xs font-semibold text-destructive uppercase mb-1">
+              Problema Registrado
+            </p>
+            <p className="text-sm font-medium text-destructive">
+              {pendencia.tipo_problema.replace(/_/g, ' ')}
+            </p>
             <p className="text-sm text-foreground mt-1">{pendencia.descricao_problema}</p>
           </div>
 
@@ -150,7 +157,9 @@ export function SolvePendenciaModal({ isOpen, onClose, pendencia, onSuccess }: S
             />
             <div className="flex justify-between mt-1">
               <p className="text-xs text-muted-foreground">Mínimo 10 caracteres</p>
-              <p className={`text-xs ${observacoes.length < 10 ? 'text-destructive' : 'text-muted-foreground'}`}>
+              <p
+                className={`text-xs ${observacoes.length < 10 ? 'text-destructive' : 'text-muted-foreground'}`}
+              >
                 {observacoes.length} / 500
               </p>
             </div>
@@ -202,8 +211,9 @@ export function SolvePendenciaModal({ isOpen, onClose, pendencia, onSuccess }: S
             <div>
               <p className="text-sm text-foreground font-medium">Importante</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Ao solucionar, a pendência será arquivada em "Resolvidas" para fins de auditoria.
-                A entrega não será finalizada automaticamente — acesse "Registrar Entrega" para concluir.
+                Ao solucionar, a pendência será arquivada em "Resolvidas" para fins de auditoria. A
+                entrega não será finalizada automaticamente — acesse "Registrar Entrega" para
+                concluir.
               </p>
             </div>
           </div>
@@ -239,5 +249,5 @@ export function SolvePendenciaModal({ isOpen, onClose, pendencia, onSuccess }: S
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

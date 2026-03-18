@@ -1,54 +1,50 @@
-import { useRef, ChangeEvent } from 'react';
-import { Camera, X, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useRef, ChangeEvent } from 'react'
+import { Camera, X, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface PhotoUploaderProps {
-  fotos: File[];
-  onFotosChange: (fotos: File[]) => void;
+  fotos: File[]
+  onFotosChange: (fotos: File[]) => void
 }
 
 export function PhotoUploader({ fotos, onFotosChange }: PhotoUploaderProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
+    const files = e.target.files
+    if (!files) return
 
-    const validTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/webp'];
-    const newFiles: File[] = [];
-    
+    const validTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/webp']
+    const newFiles: File[] = []
+
     Array.from(files).forEach((file) => {
       if (validTypes.includes(file.type)) {
-        newFiles.push(file);
+        newFiles.push(file)
       }
-    });
+    })
 
-    onFotosChange([...fotos, ...newFiles]);
+    onFotosChange([...fotos, ...newFiles])
 
     // Reset input
     if (inputRef.current) {
-      inputRef.current.value = '';
+      inputRef.current.value = ''
     }
-  };
+  }
 
   const handleRemove = (index: number) => {
-    onFotosChange(fotos.filter((_, i) => i !== index));
-  };
+    onFotosChange(fotos.filter((_, i) => i !== index))
+  }
 
   const triggerFileInput = () => {
-    inputRef.current?.click();
-  };
+    inputRef.current?.click()
+  }
 
   return (
     <div className="space-y-3">
       <div>
-        <label className="text-sm font-semibold text-foreground">
-          Fotos da Entrega
-        </label>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Registre a instalação finalizada
-        </p>
+        <label className="text-sm font-semibold text-foreground">Fotos da Entrega</label>
+        <p className="text-xs text-muted-foreground mt-0.5">Registre a instalação finalizada</p>
       </div>
 
       {/* Hidden file input */}
@@ -71,13 +67,11 @@ export function PhotoUploader({ fotos, onFotosChange }: PhotoUploaderProps) {
             'w-full h-32 border-3 border-dashed border-muted-foreground/30 rounded-xl',
             'flex flex-col items-center justify-center gap-2',
             'bg-card hover:bg-muted/50 transition-colors',
-            'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
+            'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
           )}
         >
           <Camera className="w-12 h-12 text-primary" />
-          <span className="text-sm text-muted-foreground">
-            Tirar Foto ou Escolher da Galeria
-          </span>
+          <span className="text-sm text-muted-foreground">Tirar Foto ou Escolher da Galeria</span>
         </button>
       ) : (
         /* Photos grid */
@@ -101,7 +95,7 @@ export function PhotoUploader({ fotos, onFotosChange }: PhotoUploaderProps) {
                     'bg-destructive text-destructive-foreground',
                     'flex items-center justify-center',
                     'opacity-0 group-hover:opacity-100 transition-opacity',
-                    'hover:bg-destructive/90 focus:opacity-100'
+                    'hover:bg-destructive/90 focus:opacity-100',
                   )}
                 >
                   <X className="w-4 h-4" />
@@ -128,5 +122,5 @@ export function PhotoUploader({ fotos, onFotosChange }: PhotoUploaderProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

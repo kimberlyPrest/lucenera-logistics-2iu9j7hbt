@@ -1,52 +1,55 @@
-import { useState } from 'react';
-import { Clipboard, Check, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { TableItem } from './ItemsTableInput';
+import { useState } from 'react'
+import { Clipboard, Check, AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { TableItem } from './ItemsTableInput'
 
 interface PasteListInputProps {
-  onItemsParsed: (items: TableItem[]) => void;
+  onItemsParsed: (items: TableItem[]) => void
 }
 
 export function PasteListInput({ onItemsParsed }: PasteListInputProps) {
-  const [text, setText] = useState('');
-  const [parsedItems, setParsedItems] = useState<TableItem[]>([]);
-  const [parseError, setParseError] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
+  const [text, setText] = useState('')
+  const [parsedItems, setParsedItems] = useState<TableItem[]>([])
+  const [parseError, setParseError] = useState<string | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
 
   const parseList = () => {
-    setParseError(null);
-    
+    setParseError(null)
+
     if (!text.trim()) {
-      setParseError('Cole os dados da planilha no campo acima');
-      return;
+      setParseError('Cole os dados da planilha no campo acima')
+      return
     }
 
-    const lines = text.trim().split('\n').filter(line => line.trim());
-    const items: TableItem[] = [];
-    const errors: string[] = [];
+    const lines = text
+      .trim()
+      .split('\n')
+      .filter((line) => line.trim())
+    const items: TableItem[] = []
+    const errors: string[] = []
 
     lines.forEach((line, index) => {
       // Try to split by TAB first, then by multiple spaces
-      let parts = line.split('\t');
+      let parts = line.split('\t')
       if (parts.length < 4) {
-        parts = line.split(/\s{2,}/);
+        parts = line.split(/\s{2,}/)
       }
 
       if (parts.length >= 4) {
         // Try to detect quantity (usually last numeric value)
-        let quantidade = 1;
-        let descricao = '';
-        
+        let quantidade = 1
+        let descricao = ''
+
         // Check if last part is a number
-        const lastPart = parts[parts.length - 1].replace(',', '.').trim();
-        const lastAsNumber = parseFloat(lastPart);
-        
+        const lastPart = parts[parts.length - 1].replace(',', '.').trim()
+        const lastAsNumber = parseFloat(lastPart)
+
         if (!isNaN(lastAsNumber)) {
-          quantidade = lastAsNumber;
-          descricao = parts.slice(3, -1).join(' ').trim();
+          quantidade = lastAsNumber
+          descricao = parts.slice(3, -1).join(' ').trim()
         } else {
-          descricao = parts.slice(3).join(' ').trim();
+          descricao = parts.slice(3).join(' ').trim()
         }
 
         items.push({
@@ -57,7 +60,7 @@ export function PasteListInput({ onItemsParsed }: PasteListInputProps) {
           referencia: parts[2]?.trim() || '',
           descricao: descricao || parts[3]?.trim() || '',
           quantidade,
-        });
+        })
       } else if (parts.length >= 3) {
         // Minimal format: código, referência, descrição
         items.push({
@@ -68,36 +71,36 @@ export function PasteListInput({ onItemsParsed }: PasteListInputProps) {
           referencia: parts[1]?.trim() || '',
           descricao: parts[2]?.trim() || '',
           quantidade: 1,
-        });
+        })
       } else {
-        errors.push(`Linha ${index + 1}: formato inválido`);
+        errors.push(`Linha ${index + 1}: formato inválido`)
       }
-    });
+    })
 
     if (items.length === 0) {
-      setParseError('Não foi possível identificar itens. Verifique o formato dos dados.');
-      return;
+      setParseError('Não foi possível identificar itens. Verifique o formato dos dados.')
+      return
     }
 
     if (errors.length > 0 && errors.length < lines.length) {
-      setParseError(`Atenção: ${errors.length} linha(s) ignorada(s) por formato inválido`);
+      setParseError(`Atenção: ${errors.length} linha(s) ignorada(s) por formato inválido`)
     }
 
-    setParsedItems(items);
-    setShowPreview(true);
-  };
+    setParsedItems(items)
+    setShowPreview(true)
+  }
 
   const confirmItems = () => {
-    onItemsParsed(parsedItems);
-    setText('');
-    setParsedItems([]);
-    setShowPreview(false);
-  };
+    onItemsParsed(parsedItems)
+    setText('')
+    setParsedItems([])
+    setShowPreview(false)
+  }
 
   const cancelPreview = () => {
-    setShowPreview(false);
-    setParsedItems([]);
-  };
+    setShowPreview(false)
+    setParsedItems([])
+  }
 
   return (
     <div className="space-y-4">
@@ -105,14 +108,14 @@ export function PasteListInput({ onItemsParsed }: PasteListInputProps) {
         <>
           <Textarea
             value={text}
-            onChange={e => setText(e.target.value)}
+            onChange={(e) => setText(e.target.value)}
             placeholder={`Cole dados do Excel (separados por TAB):
 
 L53\t011636\t3027-S-PM\tFINCO CLED 6W SPOT LED\t2
 L54\t009815\tACS0043\tACESSORIO HOOD\t14`}
             className="min-h-[200px] font-mono text-sm"
           />
-          
+
           {parseError && (
             <div className="flex items-center gap-2 text-destructive text-sm">
               <AlertCircle className="w-4 h-4" />
@@ -162,12 +165,7 @@ L54\t009815\tACS0043\tACESSORIO HOOD\t14`}
           </div>
 
           <div className="flex gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={cancelPreview}
-              className="flex-1 h-12"
-            >
+            <Button type="button" variant="outline" onClick={cancelPreview} className="flex-1 h-12">
               Corrigir
             </Button>
             <Button
@@ -182,5 +180,5 @@ L54\t009815\tACS0043\tACESSORIO HOOD\t14`}
         </>
       )}
     </div>
-  );
+  )
 }

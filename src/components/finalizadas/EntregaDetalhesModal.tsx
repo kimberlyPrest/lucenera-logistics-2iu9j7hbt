@@ -1,79 +1,113 @@
-import { useState, useEffect, useRef, ChangeEvent } from 'react';
+import { useState, useEffect, useRef, ChangeEvent } from 'react'
 import {
-  Calendar, MapPin, User, Star, FileText, Camera, AlertTriangle,
-  Save, Loader2, X, Plus, Shield, Undo2,
-} from 'lucide-react';
-import { EntregaFinalizada } from '@/hooks/useEntregasFinalizadas';
-import { useUserRole } from '@/hooks/useUserRole';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PhotoGallery } from './PhotoGallery';
-import { MaterialDisplay } from '@/components/separacao/MaterialDisplay';
-import { supabase } from '@/integrations/supabase/client';
-import { useSignedUrls } from '@/hooks/useSignedUrls';
-import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
+  Calendar,
+  MapPin,
+  User,
+  Star,
+  FileText,
+  Camera,
+  AlertTriangle,
+  Save,
+  Loader2,
+  X,
+  Plus,
+  Shield,
+  Undo2,
+} from 'lucide-react'
+import { EntregaFinalizada } from '@/hooks/useEntregasFinalizadas'
+import { useUserRole } from '@/hooks/useUserRole'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { PhotoGallery } from './PhotoGallery'
+import { MaterialDisplay } from '@/components/separacao/MaterialDisplay'
+import { supabase } from '@/integrations/supabase/client'
+import { useSignedUrls } from '@/hooks/useSignedUrls'
+import { useToast } from '@/hooks/use-toast'
+import { cn } from '@/lib/utils'
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-} from '@/components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { format, parseISO, differenceInCalendarDays } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+} from '@/components/ui/alert-dialog'
+import { format, parseISO, differenceInCalendarDays } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 interface EntregaDetalhesModalProps {
-  entrega: EntregaFinalizada | null;
-  open: boolean;
-  onClose: () => void;
-  onUpdated?: () => void;
+  entrega: EntregaFinalizada | null
+  open: boolean
+  onClose: () => void
+  onUpdated?: () => void
 }
 
 interface FormData {
-  cliente: string;
-  codigo_obra: string;
-  endereco: string;
-  recebido_por: string;
-  telefone: string;
-  gestora_equipe: string;
-  numero_pedido: string;
-  vendedor: string;
-  observacoes: string;
-  observacoes_internas: string;
-  data_entrega_real: string;
+  cliente: string
+  codigo_obra: string
+  endereco: string
+  recebido_por: string
+  telefone: string
+  gestora_equipe: string
+  numero_pedido: string
+  vendedor: string
+  observacoes: string
+  observacoes_internas: string
+  data_entrega_real: string
 }
 
-export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: EntregaDetalhesModalProps) {
-  const [activeTab, setActiveTab] = useState('detalhes');
-  const [isSaving, setIsSaving] = useState(false);
-  const [isReverting, setIsReverting] = useState(false);
-  const { toast } = useToast();
-  const { isAdmin } = useUserRole();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+export function EntregaDetalhesModal({
+  entrega,
+  open,
+  onClose,
+  onUpdated,
+}: EntregaDetalhesModalProps) {
+  const [activeTab, setActiveTab] = useState('detalhes')
+  const [isSaving, setIsSaving] = useState(false)
+  const [isReverting, setIsReverting] = useState(false)
+  const { toast } = useToast()
+  const { isAdmin } = useUserRole()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Form state
   const [form, setForm] = useState<FormData>({
-    cliente: '', codigo_obra: '', endereco: '', recebido_por: '',
-    telefone: '', gestora_equipe: '', numero_pedido: '', vendedor: '',
-    observacoes: '', observacoes_internas: '', data_entrega_real: '',
-  });
+    cliente: '',
+    codigo_obra: '',
+    endereco: '',
+    recebido_por: '',
+    telefone: '',
+    gestora_equipe: '',
+    numero_pedido: '',
+    vendedor: '',
+    observacoes: '',
+    observacoes_internas: '',
+    data_entrega_real: '',
+  })
 
   // Photo state: existing paths kept + paths to delete + new files to upload
-  const [existingPhotoPaths, setExistingPhotoPaths] = useState<string[]>([]);
-  const [removedPaths, setRemovedPaths] = useState<string[]>([]);
-  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [existingPhotoPaths, setExistingPhotoPaths] = useState<string[]>([])
+  const [removedPaths, setRemovedPaths] = useState<string[]>([])
+  const [newFiles, setNewFiles] = useState<File[]>([])
 
   // Signed URLs for existing photos in edit mode
   const { signedUrls: existingSignedUrls, isLoading: isLoadingUrls } = useSignedUrls(
     existingPhotoPaths,
-    'entregas-fotos'
-  );
+    'entregas-fotos',
+  )
 
   // Reset when entrega changes
   useEffect(() => {
@@ -90,120 +124,118 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
         observacoes: entrega.observacoes || '',
         observacoes_internas: entrega.observacoes_internas || '',
         data_entrega_real: format(parseISO(entrega.data_entrega_real), 'yyyy-MM-dd'),
-      });
-      setExistingPhotoPaths([...(entrega.fotos_urls || [])]);
-      setRemovedPaths([]);
-      setNewFiles([]);
-      setActiveTab('detalhes');
+      })
+      setExistingPhotoPaths([...(entrega.fotos_urls || [])])
+      setRemovedPaths([])
+      setNewFiles([])
+      setActiveTab('detalhes')
     }
-  }, [entrega]);
+  }, [entrega])
 
-  if (!entrega) return null;
+  if (!entrega) return null
 
-  const formattedDate = format(
-    parseISO(entrega.data_entrega_real),
-    "dd/MM/yyyy 'às' HH:mm",
-    { locale: ptBR }
-  );
+  const formattedDate = format(parseISO(entrega.data_entrega_real), "dd/MM/yyyy 'às' HH:mm", {
+    locale: ptBR,
+  })
 
   const vendas = entrega.numero_pedido
     ? entrega.numero_pedido.split(', ').filter((v) => v.trim())
-    : [];
+    : []
 
   const handleFieldChange = (field: keyof FormData, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
+    setForm((prev) => ({ ...prev, [field]: value }))
+  }
 
   // ── Photo management ──
   const handleRemoveExisting = (index: number) => {
-    const path = existingPhotoPaths[index];
-    setRemovedPaths((prev) => [...prev, path]);
-    setExistingPhotoPaths((prev) => prev.filter((_, i) => i !== index));
-  };
+    const path = existingPhotoPaths[index]
+    setRemovedPaths((prev) => [...prev, path])
+    setExistingPhotoPaths((prev) => prev.filter((_, i) => i !== index))
+  }
 
   const handleRemoveNew = (index: number) => {
-    setNewFiles((prev) => prev.filter((_, i) => i !== index));
-  };
+    setNewFiles((prev) => prev.filter((_, i) => i !== index))
+  }
 
   const handleAddFiles = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    const validTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/webp'];
-    const valid = Array.from(files).filter((f) => validTypes.includes(f.type));
-    setNewFiles((prev) => [...prev, ...valid]);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
+    const files = e.target.files
+    if (!files) return
+    const validTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/webp']
+    const valid = Array.from(files).filter((f) => validTypes.includes(f.type))
+    setNewFiles((prev) => [...prev, ...valid])
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   // ── Extract file path from any URL format ──
   const extractFilePath = (url: string): string => {
     if (url.includes('/sign/') && url.includes('token=')) {
-      const match = url.match(/\/sign\/[^/]+\/(.+?)\?/);
-      if (match) return decodeURIComponent(match[1]);
+      const match = url.match(/\/sign\/[^/]+\/(.+?)\?/)
+      if (match) return decodeURIComponent(match[1])
     } else if (url.includes('/storage/v1/object/public/')) {
-      const match = url.match(/\/public\/[^/]+\/(.+)$/);
-      if (match) return decodeURIComponent(match[1]);
+      const match = url.match(/\/public\/[^/]+\/(.+)$/)
+      if (match) return decodeURIComponent(match[1])
     }
-    return url;
-  };
+    return url
+  }
 
   // ── Revert to separation (admin only) ──
   const handleRevertToSeparacao = async () => {
-    if (!entrega) return;
-    setIsReverting(true);
+    if (!entrega) return
+    setIsReverting(true)
     try {
       // 1. Update separacao status back to em_separacao
       const { error: updateError } = await supabase
         .from('separacoes')
         .update({ status: 'em_separacao' })
-        .eq('id', entrega.separacao_id);
-      if (updateError) throw updateError;
+        .eq('id', entrega.separacao_id)
+      if (updateError) throw updateError
 
       // 2. Delete the entregas_finalizadas record
       const { error: deleteError } = await supabase
         .from('entregas_finalizadas')
         .delete()
-        .eq('id', entrega.id);
-      if (deleteError) throw deleteError;
+        .eq('id', entrega.id)
+      if (deleteError) throw deleteError
 
-      toast({ title: '✅ Entrega revertida para separação com sucesso!' });
-      onUpdated?.();
-      onClose();
+      toast({ title: '✅ Entrega revertida para separação com sucesso!' })
+      onUpdated?.()
+      onClose()
     } catch (err) {
       toast({
         title: 'Erro ao reverter',
         description: err instanceof Error ? err.message : 'Tente novamente.',
         variant: 'destructive',
-      });
+      })
     } finally {
-      setIsReverting(false);
+      setIsReverting(false)
     }
-  };
+  }
 
   // ── Save ──
   const handleSave = async () => {
-    setIsSaving(true);
+    setIsSaving(true)
     try {
       // 1. Delete removed photos from storage
       if (removedPaths.length > 0) {
-        const pathsToDelete = removedPaths.map(extractFilePath);
-        await supabase.storage.from('entregas-fotos').remove(pathsToDelete);
+        const pathsToDelete = removedPaths.map(extractFilePath)
+        await supabase.storage.from('entregas-fotos').remove(pathsToDelete)
       }
 
       // 2. Upload new files
-      const uploadedPaths: string[] = [];
+      const uploadedPaths: string[] = []
       for (let i = 0; i < newFiles.length; i++) {
-        const file = newFiles[i];
-        const filePath = `${entrega.codigo_obra}/${Date.now()}_new_${i}.${file.name.split('.').pop()}`;
+        const file = newFiles[i]
+        const filePath = `${entrega.codigo_obra}/${Date.now()}_new_${i}.${file.name.split('.').pop()}`
         const { error: uploadErr } = await supabase.storage
           .from('entregas-fotos')
-          .upload(filePath, file, { upsert: false });
-        if (uploadErr) throw uploadErr;
-        uploadedPaths.push(filePath);
+          .upload(filePath, file, { upsert: false })
+        if (uploadErr) throw uploadErr
+        uploadedPaths.push(filePath)
       }
 
       // 3. Build final photo list (existing kept paths as raw paths + new uploaded paths)
-      const keptPaths = existingPhotoPaths.map(extractFilePath);
-      const finalPhotos = [...keptPaths, ...uploadedPaths];
+      const keptPaths = existingPhotoPaths.map(extractFilePath)
+      const finalPhotos = [...keptPaths, ...uploadedPaths]
 
       // 4. Update record
       const { error } = await supabase
@@ -222,25 +254,25 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
           fotos_urls: finalPhotos,
           data_entrega_real: new Date(form.data_entrega_real + 'T12:00:00').toISOString(),
         })
-        .eq('id', entrega.id);
+        .eq('id', entrega.id)
 
-      if (error) throw error;
+      if (error) throw error
 
-      toast({ title: '✅ Entrega atualizada com sucesso!' });
-      onUpdated?.();
-      onClose();
+      toast({ title: '✅ Entrega atualizada com sucesso!' })
+      onUpdated?.()
+      onClose()
     } catch (err) {
       toast({
         title: 'Erro ao salvar',
         description: err instanceof Error ? err.message : 'Tente novamente.',
         variant: 'destructive',
-      });
+      })
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
-  const totalPhotos = existingPhotoPaths.length + newFiles.length;
+  const totalPhotos = existingPhotoPaths.length + newFiles.length
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -262,8 +294,12 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
           <TabsList className="w-full">
-            <TabsTrigger value="detalhes" className="flex-1">Detalhes</TabsTrigger>
-            <TabsTrigger value="editar" className="flex-1">Editar</TabsTrigger>
+            <TabsTrigger value="detalhes" className="flex-1">
+              Detalhes
+            </TabsTrigger>
+            <TabsTrigger value="editar" className="flex-1">
+              Editar
+            </TabsTrigger>
           </TabsList>
 
           {/* ── ABA DETALHES ── */}
@@ -290,7 +326,9 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
                     <div className="flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                       <p className="text-sm text-foreground">
-                        {format(parseISO(entrega.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                        {format(parseISO(entrega.created_at), "dd/MM/yyyy 'às' HH:mm", {
+                          locale: ptBR,
+                        })}
                       </p>
                     </div>
                   </div>
@@ -300,7 +338,9 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
                     <p className="field-label mb-1">Gestora responsável</p>
                     <div className="flex items-center gap-1.5">
                       <Star className="w-3.5 h-3.5 text-purple-500" />
-                      <p className="text-sm font-medium text-foreground">{entrega.gestora_equipe}</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {entrega.gestora_equipe}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -328,8 +368,13 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
                     </div>
                     <p className="text-xs text-blue-600 font-medium mt-0.5">
                       {(() => {
-                        const dias = differenceInCalendarDays(parseISO(entrega.data_entrega_real), parseISO(entrega.data_solicitacao));
-                        return dias === 0 ? 'Entregue no mesmo dia' : `${dias} dia${dias !== 1 ? 's' : ''} até a entrega`;
+                        const dias = differenceInCalendarDays(
+                          parseISO(entrega.data_entrega_real),
+                          parseISO(entrega.data_solicitacao),
+                        )
+                        return dias === 0
+                          ? 'Entregue no mesmo dia'
+                          : `${dias} dia${dias !== 1 ? 's' : ''} até a entrega`
                       })()}
                     </p>
                   </div>
@@ -351,7 +396,9 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
                 {entrega.numero_entrega && (
                   <div>
                     <p className="field-label mb-1">Nº Entrega</p>
-                    <p className="text-sm font-mono font-bold text-primary">{entrega.numero_entrega}</p>
+                    <p className="text-sm font-mono font-bold text-primary">
+                      {entrega.numero_entrega}
+                    </p>
                   </div>
                 )}
                 <div>
@@ -369,7 +416,11 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {vendas.map((venda, idx) => (
-                    <Badge key={idx} variant="secondary" className="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-xl">
+                    <Badge
+                      key={idx}
+                      variant="secondary"
+                      className="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-xl"
+                    >
                       {venda}
                     </Badge>
                   ))}
@@ -387,21 +438,29 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
             </div>
 
             <div>
-              <p className="text-sm font-semibold text-foreground mb-2">Ocorrências e Observações</p>
+              <p className="text-sm font-semibold text-foreground mb-2">
+                Ocorrências e Observações
+              </p>
               {entrega.observacoes ? (
                 <div className="bg-muted rounded-lg p-3 border border-border">
                   <p className="text-sm text-secondary-foreground">{entrega.observacoes}</p>
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground italic">Nenhuma ocorrência registrada</p>
+                <p className="text-sm text-muted-foreground italic">
+                  Nenhuma ocorrência registrada
+                </p>
               )}
               {entrega.observacoes_internas && (
                 <div className="mt-3 bg-amber-50 dark:bg-amber-950/30 border-l-[3px] border-l-amber-500 rounded-r-md p-3">
                   <div className="flex items-center gap-1.5 mb-1">
                     <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                    <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">Observação Interna</p>
+                    <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">
+                      Observação Interna
+                    </p>
                   </div>
-                  <p className="text-sm text-amber-900 dark:text-amber-200">{entrega.observacoes_internas}</p>
+                  <p className="text-sm text-amber-900 dark:text-amber-200">
+                    {entrega.observacoes_internas}
+                  </p>
                 </div>
               )}
             </div>
@@ -410,8 +469,17 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
               {isAdmin && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="text-orange-600 border-orange-300 hover:bg-orange-50" disabled={isReverting}>
-                      {isReverting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Undo2 className="w-4 h-4 mr-2" />}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                      disabled={isReverting}
+                    >
+                      {isReverting ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Undo2 className="w-4 h-4 mr-2" />
+                      )}
                       Reverter para Separação
                     </Button>
                   </AlertDialogTrigger>
@@ -419,20 +487,25 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
                     <AlertDialogHeader>
                       <AlertDialogTitle>Reverter entrega?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Isso vai remover esta entrega das finalizadas e voltar o pedido para "Em Separação".
-                        Use quando a baixa foi dada no código errado.
+                        Isso vai remover esta entrega das finalizadas e voltar o pedido para "Em
+                        Separação". Use quando a baixa foi dada no código errado.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleRevertToSeparacao} className="bg-orange-600 hover:bg-orange-700">
+                      <AlertDialogAction
+                        onClick={handleRevertToSeparacao}
+                        className="bg-orange-600 hover:bg-orange-700"
+                      >
                         Sim, reverter
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
               )}
-              <Button variant="outline" onClick={onClose}>Fechar</Button>
+              <Button variant="outline" onClick={onClose}>
+                Fechar
+              </Button>
             </div>
           </TabsContent>
 
@@ -458,7 +531,7 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
                   className={cn(
                     'w-full h-28 border-2 border-dashed border-muted-foreground/30 rounded-xl',
                     'flex flex-col items-center justify-center gap-2',
-                    'bg-card hover:bg-muted/50 transition-colors'
+                    'bg-card hover:bg-muted/50 transition-colors',
                   )}
                 >
                   <Camera className="w-10 h-10 text-primary" />
@@ -469,7 +542,10 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                     {/* Existing photos */}
                     {existingPhotoPaths.map((_, index) => (
-                      <div key={`existing-${index}`} className="relative aspect-square rounded-lg overflow-hidden bg-muted group">
+                      <div
+                        key={`existing-${index}`}
+                        className="relative aspect-square rounded-lg overflow-hidden bg-muted group"
+                      >
                         {isLoadingUrls ? (
                           <div className="w-full h-full skeleton-pulse" />
                         ) : (
@@ -487,7 +563,7 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
                             'bg-destructive text-destructive-foreground',
                             'flex items-center justify-center',
                             'opacity-0 group-hover:opacity-100 transition-opacity',
-                            'hover:bg-destructive/90 focus:opacity-100'
+                            'hover:bg-destructive/90 focus:opacity-100',
                           )}
                         >
                           <X className="w-3 h-3" />
@@ -497,7 +573,10 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
 
                     {/* New files */}
                     {newFiles.map((file, index) => (
-                      <div key={`new-${index}`} className="relative aspect-square rounded-lg overflow-hidden bg-muted group ring-2 ring-green-400">
+                      <div
+                        key={`new-${index}`}
+                        className="relative aspect-square rounded-lg overflow-hidden bg-muted group ring-2 ring-green-400"
+                      >
                         <img
                           src={URL.createObjectURL(file)}
                           alt={`Nova foto ${index + 1}`}
@@ -514,7 +593,7 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
                             'bg-destructive text-destructive-foreground',
                             'flex items-center justify-center',
                             'opacity-0 group-hover:opacity-100 transition-opacity',
-                            'hover:bg-destructive/90 focus:opacity-100'
+                            'hover:bg-destructive/90 focus:opacity-100',
                           )}
                         >
                           <X className="w-3 h-3" />
@@ -535,12 +614,19 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
                   </Button>
 
                   <p className="text-xs text-muted-foreground">
-                    {existingPhotoPaths.length} existente{existingPhotoPaths.length !== 1 ? 's' : ''}
+                    {existingPhotoPaths.length} existente
+                    {existingPhotoPaths.length !== 1 ? 's' : ''}
                     {newFiles.length > 0 && (
-                      <span className="text-success font-medium"> + {newFiles.length} nova{newFiles.length !== 1 ? 's' : ''}</span>
+                      <span className="text-success font-medium">
+                        {' '}
+                        + {newFiles.length} nova{newFiles.length !== 1 ? 's' : ''}
+                      </span>
                     )}
                     {removedPaths.length > 0 && (
-                      <span className="text-destructive font-medium"> − {removedPaths.length} removida{removedPaths.length !== 1 ? 's' : ''}</span>
+                      <span className="text-destructive font-medium">
+                        {' '}
+                        − {removedPaths.length} removida{removedPaths.length !== 1 ? 's' : ''}
+                      </span>
                     )}
                   </p>
                 </>
@@ -551,54 +637,108 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
                 <Label htmlFor="edit-cliente">Cliente</Label>
-                <Input id="edit-cliente" value={form.cliente} onChange={(e) => handleFieldChange('cliente', e.target.value)} />
+                <Input
+                  id="edit-cliente"
+                  value={form.cliente}
+                  onChange={(e) => handleFieldChange('cliente', e.target.value)}
+                />
               </div>
               <div>
                 <Label htmlFor="edit-data-entrega">Data da Entrega</Label>
-                <Input id="edit-data-entrega" type="date" value={form.data_entrega_real} onChange={(e) => handleFieldChange('data_entrega_real', e.target.value)} className="h-11" />
+                <Input
+                  id="edit-data-entrega"
+                  type="date"
+                  value={form.data_entrega_real}
+                  onChange={(e) => handleFieldChange('data_entrega_real', e.target.value)}
+                  className="h-11"
+                />
               </div>
               <div>
                 <Label htmlFor="edit-codigo">Código da Obra</Label>
-                <Input id="edit-codigo" value={form.codigo_obra} onChange={(e) => handleFieldChange('codigo_obra', e.target.value)} />
+                <Input
+                  id="edit-codigo"
+                  value={form.codigo_obra}
+                  onChange={(e) => handleFieldChange('codigo_obra', e.target.value)}
+                />
               </div>
               <div>
                 <Label htmlFor="edit-recebido">Quem Recebeu</Label>
-                <Input id="edit-recebido" value={form.recebido_por} onChange={(e) => handleFieldChange('recebido_por', e.target.value)} />
+                <Input
+                  id="edit-recebido"
+                  value={form.recebido_por}
+                  onChange={(e) => handleFieldChange('recebido_por', e.target.value)}
+                />
               </div>
               <div>
                 <Label htmlFor="edit-telefone">Telefone</Label>
-                <Input id="edit-telefone" value={form.telefone} onChange={(e) => handleFieldChange('telefone', e.target.value)} />
+                <Input
+                  id="edit-telefone"
+                  value={form.telefone}
+                  onChange={(e) => handleFieldChange('telefone', e.target.value)}
+                />
               </div>
               <div>
                 <Label htmlFor="edit-gestora">Gestora</Label>
-                <Input id="edit-gestora" value={form.gestora_equipe} onChange={(e) => handleFieldChange('gestora_equipe', e.target.value)} />
+                <Input
+                  id="edit-gestora"
+                  value={form.gestora_equipe}
+                  onChange={(e) => handleFieldChange('gestora_equipe', e.target.value)}
+                />
               </div>
               <div className="sm:col-span-2">
                 <Label htmlFor="edit-endereco">Endereço</Label>
-                <Input id="edit-endereco" value={form.endereco} onChange={(e) => handleFieldChange('endereco', e.target.value)} />
+                <Input
+                  id="edit-endereco"
+                  value={form.endereco}
+                  onChange={(e) => handleFieldChange('endereco', e.target.value)}
+                />
               </div>
               <div>
                 <Label htmlFor="edit-vendas">Vendas (separadas por vírgula)</Label>
-                <Input id="edit-vendas" value={form.numero_pedido} onChange={(e) => handleFieldChange('numero_pedido', e.target.value)} />
+                <Input
+                  id="edit-vendas"
+                  value={form.numero_pedido}
+                  onChange={(e) => handleFieldChange('numero_pedido', e.target.value)}
+                />
               </div>
               <div>
                 <Label htmlFor="edit-vendedor">Solicitante</Label>
-                <Input id="edit-vendedor" value={form.vendedor} onChange={(e) => handleFieldChange('vendedor', e.target.value)} />
+                <Input
+                  id="edit-vendedor"
+                  value={form.vendedor}
+                  onChange={(e) => handleFieldChange('vendedor', e.target.value)}
+                />
               </div>
               <div className="sm:col-span-2">
                 <Label htmlFor="edit-obs">Observações</Label>
-                <Textarea id="edit-obs" rows={3} value={form.observacoes} onChange={(e) => handleFieldChange('observacoes', e.target.value)} />
+                <Textarea
+                  id="edit-obs"
+                  rows={3}
+                  value={form.observacoes}
+                  onChange={(e) => handleFieldChange('observacoes', e.target.value)}
+                />
               </div>
               <div className="sm:col-span-2">
                 <Label htmlFor="edit-obs-int">Observações Internas</Label>
-                <Textarea id="edit-obs-int" rows={3} value={form.observacoes_internas} onChange={(e) => handleFieldChange('observacoes_internas', e.target.value)} />
+                <Textarea
+                  id="edit-obs-int"
+                  rows={3}
+                  value={form.observacoes_internas}
+                  onChange={(e) => handleFieldChange('observacoes_internas', e.target.value)}
+                />
               </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" onClick={onClose} disabled={isSaving}>Cancelar</Button>
+              <Button variant="outline" onClick={onClose} disabled={isSaving}>
+                Cancelar
+              </Button>
               <Button onClick={handleSave} disabled={isSaving}>
-                {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                {isSaving ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4 mr-2" />
+                )}
                 Salvar Alterações
               </Button>
             </div>
@@ -606,5 +746,5 @@ export function EntregaDetalhesModal({ entrega, open, onClose, onUpdated }: Entr
         </Tabs>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

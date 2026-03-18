@@ -1,13 +1,13 @@
-import { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserRole } from '@/hooks/useUserRole';
-import { Loader2 } from 'lucide-react';
+import { ReactNode } from 'react'
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
+import { useUserRole } from '@/hooks/useUserRole'
+import { Loader2 } from 'lucide-react'
 
 interface EntregadorRouteProps {
-  children: ReactNode;
+  children: ReactNode
   /** Routes allowed only for non-entregador users */
-  blockEntregador?: boolean;
+  blockEntregador?: boolean
 }
 
 /**
@@ -15,8 +15,8 @@ interface EntregadorRouteProps {
  * Redirects them to /otimizar-rota (their home page).
  */
 export function EntregadorRoute({ children, blockEntregador = true }: EntregadorRouteProps) {
-  const { user, isLoading: authLoading } = useAuth();
-  const { isEntregador, isLoading: roleLoading } = useUserRole();
+  const { user, isLoading: authLoading } = useAuth()
+  const { isEntregador, isLoading: roleLoading } = useUserRole()
 
   if (authLoading || roleLoading) {
     return (
@@ -26,16 +26,16 @@ export function EntregadorRoute({ children, blockEntregador = true }: Entregador
           <p className="text-muted-foreground">Carregando...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace />
   }
 
   if (blockEntregador && isEntregador) {
-    return <Navigate to="/otimizar-rota" replace />;
+    return <Navigate to="/otimizar-rota" replace />
   }
 
-  return <>{children}</>;
+  return <>{children}</>
 }

@@ -1,33 +1,27 @@
-import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
+import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
 
 interface ObservationsFieldProps {
-  value: string;
-  onChange: (value: string) => void;
-  maxLength?: number;
+  value: string
+  onChange: (value: string) => void
+  maxLength?: number
 }
 
-export function ObservationsField({ 
-  value, 
-  onChange, 
-  maxLength = 1000 
-}: ObservationsFieldProps) {
-  const remainingChars = maxLength - value.length;
-  const isNearLimit = remainingChars < 100;
-  const isAtLimit = remainingChars <= 0;
+export function ObservationsField({ value, onChange, maxLength = 1000 }: ObservationsFieldProps) {
+  const remainingChars = maxLength - value.length
+  const isNearLimit = remainingChars < 100
+  const isAtLimit = remainingChars <= 0
 
   const handleChange = (newValue: string) => {
     if (newValue.length <= maxLength) {
-      onChange(newValue);
+      onChange(newValue)
     }
-  };
+  }
 
   return (
     <div className="space-y-2">
       <div>
-        <label className="text-sm font-semibold text-foreground">
-          Observações (Opcional)
-        </label>
+        <label className="text-sm font-semibold text-foreground">Observações (Opcional)</label>
         <p className="text-xs text-muted-foreground mt-0.5">
           Registre problemas ou informações importantes
         </p>
@@ -41,22 +35,24 @@ export function ObservationsField({
           className={cn(
             'min-h-[120px] text-base border-2 rounded-xl resize-none',
             'focus-visible:ring-primary/20',
-            isAtLimit && 'border-destructive'
+            isAtLimit && 'border-destructive',
           )}
         />
-        
+
         {/* Character counter */}
-        <div 
+        <div
           className={cn(
             'absolute bottom-3 right-3 text-xs',
-            isAtLimit ? 'text-destructive font-medium' : 
-            isNearLimit ? 'text-warning' : 
-            'text-muted-foreground'
+            isAtLimit
+              ? 'text-destructive font-medium'
+              : isNearLimit
+                ? 'text-warning'
+                : 'text-muted-foreground',
           )}
         >
           {value.length} / {maxLength}
         </div>
       </div>
     </div>
-  );
+  )
 }

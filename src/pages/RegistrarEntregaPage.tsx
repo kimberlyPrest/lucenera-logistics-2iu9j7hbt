@@ -1,121 +1,128 @@
-import { useState, useCallback } from 'react';
-import { Truck, Loader2, AlertTriangle, ShieldAlert } from 'lucide-react';
-import { AppLayout } from '@/components/layout/AppLayout';
-import { CodeInput } from '@/components/registrar/CodeInput';
-import { ObraResumoCard } from '@/components/registrar/ObraResumoCard';
-import { PhotoUploader } from '@/components/registrar/PhotoUploader';
-import { ReceiverInput } from '@/components/registrar/ReceiverInput';
-import { ObservationsField } from '@/components/registrar/ObservationsField';
-import { RegisterProblemModal } from '@/components/registrar/RegisterProblemModal';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useSeparacoes, Separacao } from '@/hooks/useSeparacoes';
-import { useFinalizarEntrega } from '@/hooks/useFinalizarEntrega';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { useState, useCallback } from 'react'
+import { Truck, Loader2, AlertTriangle, ShieldAlert } from 'lucide-react'
+import { AppLayout } from '@/components/layout/AppLayout'
+import { CodeInput } from '@/components/registrar/CodeInput'
+import { ObraResumoCard } from '@/components/registrar/ObraResumoCard'
+import { PhotoUploader } from '@/components/registrar/PhotoUploader'
+import { ReceiverInput } from '@/components/registrar/ReceiverInput'
+import { ObservationsField } from '@/components/registrar/ObservationsField'
+import { RegisterProblemModal } from '@/components/registrar/RegisterProblemModal'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useSeparacoes, Separacao } from '@/hooks/useSeparacoes'
+import { useFinalizarEntrega } from '@/hooks/useFinalizarEntrega'
+import { useAuth } from '@/contexts/AuthContext'
+import { useToast } from '@/hooks/use-toast'
+import { cn } from '@/lib/utils'
+import { format } from 'date-fns'
 
-type ValidationState = 'idle' | 'loading' | 'success' | 'error';
+type ValidationState = 'idle' | 'loading' | 'success' | 'error'
 
 export default function RegistrarEntregaPage() {
-  const [codigoObra, setCodigoObra] = useState('');
-  const [validationState, setValidationState] = useState<ValidationState>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [obraData, setObraData] = useState<Separacao | null>(null);
-  const [fotos, setFotos] = useState<File[]>([]);
-  const [recebidoPor, setRecebidoPor] = useState('');
-  const [observacoes, setObservacoes] = useState('');
-  
-  // New fields
-  const [quemEntregou, setQuemEntregou] = useState('');
-  const [telefoneContato, setTelefoneContato] = useState('');
-  const [dataEntrega, setDataEntrega] = useState(format(new Date(), 'yyyy-MM-dd'));
-  
-  // Problem modal
-  const [isProblemModalOpen, setIsProblemModalOpen] = useState(false);
+  const [codigoObra, setCodigoObra] = useState('')
+  const [validationState, setValidationState] = useState<ValidationState>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
+  const [obraData, setObraData] = useState<Separacao | null>(null)
+  const [fotos, setFotos] = useState<File[]>([])
+  const [recebidoPor, setRecebidoPor] = useState('')
+  const [observacoes, setObservacoes] = useState('')
 
-  const { findByCodigoObra } = useSeparacoes();
-  const { finalizarEntrega, isSubmitting } = useFinalizarEntrega();
-  const { user } = useAuth();
-  const { toast } = useToast();
+  // New fields
+  const [quemEntregou, setQuemEntregou] = useState('')
+  const [telefoneContato, setTelefoneContato] = useState('')
+  const [dataEntrega, setDataEntrega] = useState(format(new Date(), 'yyyy-MM-dd'))
+
+  // Problem modal
+  const [isProblemModalOpen, setIsProblemModalOpen] = useState(false)
+
+  const { findByCodigoObra } = useSeparacoes()
+  const { finalizarEntrega, isSubmitting } = useFinalizarEntrega()
+  const { user } = useAuth()
+  const { toast } = useToast()
 
   // Validate code: numeric 5-6 digits (codigo_obra) OR LUC-NNNN format (numero_entrega)
   const isValidCodeFormat = (code: string) =>
-    /^[0-9]{5,6}$/.test(code) || /^LUC-\d{1,6}$/i.test(code);
+    /^[0-9]{5,6}$/.test(code) || /^LUC-\d{1,6}$/i.test(code)
 
-  const validateCode = useCallback(async (force = false) => {
-    const trimmedCode = codigoObra.trim();
-    
-    // Skip re-validation if already validated successfully (prevents blur re-trigger)
-    if (!force && validationState === 'success' && obraData) {
-      return;
-    }
+  const validateCode = useCallback(
+    async (force = false) => {
+      const trimmedCode = codigoObra.trim()
 
-    if (!trimmedCode) {
-      setValidationState('idle');
-      setObraData(null);
-      return;
-    }
+      // Skip re-validation if already validated successfully (prevents blur re-trigger)
+      if (!force && validationState === 'success' && obraData) {
+        return
+      }
 
-    // Validate format
-    if (!isValidCodeFormat(trimmedCode)) {
-      setValidationState('error');
-      setErrorMessage('Código inválido. Use: LUC-0001 (número da entrega) ou 26001 (código da obra)');
-      setObraData(null);
-      return;
-    }
+      if (!trimmedCode) {
+        setValidationState('idle')
+        setObraData(null)
+        return
+      }
 
-    setValidationState('loading');
-    setErrorMessage('');
+      // Validate format
+      if (!isValidCodeFormat(trimmedCode)) {
+        setValidationState('error')
+        setErrorMessage(
+          'Código inválido. Use: LUC-0001 (número da entrega) ou 26001 (código da obra)',
+        )
+        setObraData(null)
+        return
+      }
 
-    const separacao = await findByCodigoObra(trimmedCode);
+      setValidationState('loading')
+      setErrorMessage('')
 
-    if (!separacao) {
-      setValidationState('error');
-      setErrorMessage('Código não encontrado. Verifique e tente novamente.');
-      setObraData(null);
-      return;
-    }
+      const separacao = await findByCodigoObra(trimmedCode)
 
-    // Check status - allow 'separado' and 'em_separacao'
-    const allowedStatuses = ['separado', 'em_separacao', 'matheus_separacao_garantia'];
-    
-    if (separacao.status === 'material_solicitado') {
-      setValidationState('error');
-      setErrorMessage('⚠️ Esta obra ainda está aguardando material. Aguarde ou fale com o escritório.');
-      setObraData(null);
-      return;
-    }
+      if (!separacao) {
+        setValidationState('error')
+        setErrorMessage('Código não encontrado. Verifique e tente novamente.')
+        setObraData(null)
+        return
+      }
 
-    if (separacao.status === 'pendente') {
-      setValidationState('error');
-      setErrorMessage('⚠️ Esta obra está com pendência registrada. Resolva a pendência primeiro.');
-      setObraData(null);
-      return;
-    }
+      // Check status - allow 'separado' and 'em_separacao'
+      const allowedStatuses = ['separado', 'em_separacao', 'matheus_separacao_garantia']
 
-    if (separacao.status === 'finalizado') {
-      setValidationState('error');
-      setErrorMessage('Esta obra já foi entregue anteriormente.');
-      setObraData(null);
-      return;
-    }
+      if (separacao.status === 'material_solicitado') {
+        setValidationState('error')
+        setErrorMessage(
+          '⚠️ Esta obra ainda está aguardando material. Aguarde ou fale com o escritório.',
+        )
+        setObraData(null)
+        return
+      }
 
-    // Success - obra found and status is valid
-    setValidationState('success');
-    setObraData(separacao);
-    setRecebidoPor(separacao.responsavel_recebimento);
-    setTelefoneContato(separacao.telefone || '');
-    setQuemEntregou('Alexandre');
-    
-    toast({
-      title: 'Obra encontrada! ✓',
-      description: separacao.cliente,
-      className: 'bg-success text-success-foreground border-none',
-    });
-  }, [codigoObra, validationState, obraData, findByCodigoObra, toast]);
+      if (separacao.status === 'pendente') {
+        setValidationState('error')
+        setErrorMessage('⚠️ Esta obra está com pendência registrada. Resolva a pendência primeiro.')
+        setObraData(null)
+        return
+      }
+
+      if (separacao.status === 'finalizado') {
+        setValidationState('error')
+        setErrorMessage('Esta obra já foi entregue anteriormente.')
+        setObraData(null)
+        return
+      }
+
+      // Success - obra found and status is valid
+      setValidationState('success')
+      setObraData(separacao)
+      setRecebidoPor(separacao.responsavel_recebimento)
+      setTelefoneContato(separacao.telefone || '')
+      setQuemEntregou('Alexandre')
+
+      toast({
+        title: 'Obra encontrada! ✓',
+        description: separacao.cliente,
+        className: 'bg-success text-success-foreground border-none',
+      })
+    },
+    [codigoObra, validationState, obraData, findByCodigoObra, toast],
+  )
 
   const handleSubmit = async () => {
     if (!obraData) {
@@ -123,8 +130,8 @@ export default function RegistrarEntregaPage() {
         title: 'Código inválido',
         description: 'Digite um código de obra válido.',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
 
     if (fotos.length === 0) {
@@ -132,8 +139,8 @@ export default function RegistrarEntregaPage() {
         title: 'Fotos obrigatórias',
         description: 'Adicione pelo menos uma foto da entrega.',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
 
     if (!recebidoPor.trim() || recebidoPor.trim().length < 3) {
@@ -141,8 +148,8 @@ export default function RegistrarEntregaPage() {
         title: 'Campo obrigatório',
         description: 'Informe quem recebeu a entrega (mínimo 3 caracteres).',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
 
     if (!quemEntregou.trim() || quemEntregou.trim().length < 2) {
@@ -150,8 +157,8 @@ export default function RegistrarEntregaPage() {
         title: 'Campo obrigatório',
         description: 'Informe quem realizou a entrega.',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
 
     const success = await finalizarEntrega({
@@ -160,36 +167,41 @@ export default function RegistrarEntregaPage() {
       fotos,
       observacoes: observacoes.trim(),
       dataEntrega,
-    });
+    })
 
     if (success) {
       // Reset form
-      setCodigoObra('');
-      setValidationState('idle');
-      setObraData(null);
-      setFotos([]);
-      setRecebidoPor('');
-      setObservacoes('');
-      setQuemEntregou('');
-      setTelefoneContato('');
-      setDataEntrega(format(new Date(), 'yyyy-MM-dd'));
+      setCodigoObra('')
+      setValidationState('idle')
+      setObraData(null)
+      setFotos([])
+      setRecebidoPor('')
+      setObservacoes('')
+      setQuemEntregou('')
+      setTelefoneContato('')
+      setDataEntrega(format(new Date(), 'yyyy-MM-dd'))
     }
-  };
+  }
 
   const handleProblemSuccess = () => {
     // Reset form after registering problem
-    setCodigoObra('');
-    setValidationState('idle');
-    setObraData(null);
-    setFotos([]);
-    setRecebidoPor('');
-    setObservacoes('');
-    setQuemEntregou('');
-    setTelefoneContato('');
-    setDataEntrega(format(new Date(), 'yyyy-MM-dd'));
-  };
+    setCodigoObra('')
+    setValidationState('idle')
+    setObraData(null)
+    setFotos([])
+    setRecebidoPor('')
+    setObservacoes('')
+    setQuemEntregou('')
+    setTelefoneContato('')
+    setDataEntrega(format(new Date(), 'yyyy-MM-dd'))
+  }
 
-  const canSubmit = obraData && fotos.length > 0 && recebidoPor.trim().length >= 3 && quemEntregou.trim().length >= 2 && !isSubmitting;
+  const canSubmit =
+    obraData &&
+    fotos.length > 0 &&
+    recebidoPor.trim().length >= 3 &&
+    quemEntregou.trim().length >= 2 &&
+    !isSubmitting
 
   return (
     <AppLayout>
@@ -222,37 +234,46 @@ export default function RegistrarEntregaPage() {
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0" />
                 <h3 className="text-base font-bold text-amber-800 dark:text-amber-300 uppercase">
-                  {obraData.tipo_pedido === 'garantia' ? '⚠️ Entrega de Garantia' : '⚠️ Inclui Peça de Garantia'}
+                  {obraData.tipo_pedido === 'garantia'
+                    ? '⚠️ Entrega de Garantia'
+                    : '⚠️ Inclui Peça de Garantia'}
                 </h3>
               </div>
               {obraData.tipo_pedido === 'garantia' && obraData.garantia_detalhes && (
                 <div>
-                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase">Detalhes da garantia:</p>
-                  <p className="text-sm text-amber-900 dark:text-amber-200 mt-1">{obraData.garantia_detalhes}</p>
+                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase">
+                    Detalhes da garantia:
+                  </p>
+                  <p className="text-sm text-amber-900 dark:text-amber-200 mt-1">
+                    {obraData.garantia_detalhes}
+                  </p>
                 </div>
               )}
               {obraData.inclui_garantia && obraData.garantia_peca && (
                 <div>
-                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase">Peça de garantia:</p>
-                  <p className="text-sm text-amber-900 dark:text-amber-200 mt-1 font-medium">{obraData.garantia_peca}</p>
+                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase">
+                    Peça de garantia:
+                  </p>
+                  <p className="text-sm text-amber-900 dark:text-amber-200 mt-1 font-medium">
+                    {obraData.garantia_peca}
+                  </p>
                 </div>
               )}
               {obraData.inclui_garantia && obraData.garantia_motivo && (
                 <div>
-                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase">Motivo:</p>
-                  <p className="text-sm text-amber-900 dark:text-amber-200 mt-1">{obraData.garantia_motivo}</p>
+                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase">
+                    Motivo:
+                  </p>
+                  <p className="text-sm text-amber-900 dark:text-amber-200 mt-1">
+                    {obraData.garantia_motivo}
+                  </p>
                 </div>
               )}
             </div>
           )}
 
           {/* Step 3: Photo Upload */}
-          {obraData && (
-            <PhotoUploader
-              fotos={fotos}
-              onFotosChange={setFotos}
-            />
-          )}
+          {obraData && <PhotoUploader fotos={fotos} onFotosChange={setFotos} />}
 
           {/* Step 4: Quem Entregou */}
           {obraData && (
@@ -268,12 +289,7 @@ export default function RegistrarEntregaPage() {
           )}
 
           {/* Step 5: Receiver Confirmation */}
-          {obraData && (
-            <ReceiverInput
-              value={recebidoPor}
-              onChange={setRecebidoPor}
-            />
-          )}
+          {obraData && <ReceiverInput value={recebidoPor} onChange={setRecebidoPor} />}
 
           {/* Step 6: Telefone (editable) */}
           {obraData && (
@@ -286,9 +302,7 @@ export default function RegistrarEntregaPage() {
                 placeholder="(16) 99999-9999"
                 className="h-14"
               />
-              <p className="text-xs text-muted-foreground mt-1">
-                Pode editar se o telefone mudou
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">Pode editar se o telefone mudou</p>
             </div>
           )}
 
@@ -310,12 +324,7 @@ export default function RegistrarEntregaPage() {
           )}
 
           {/* Step 8: Observations */}
-          {obraData && (
-            <ObservationsField
-              value={observacoes}
-              onChange={setObservacoes}
-            />
-          )}
+          {obraData && <ObservationsField value={observacoes} onChange={setObservacoes} />}
         </div>
       </div>
 
@@ -330,7 +339,7 @@ export default function RegistrarEntregaPage() {
                 'flex-1 h-16 text-lg font-bold rounded-xl transition-all',
                 canSubmit
                   ? 'bg-success hover:bg-success-dark text-success-foreground'
-                  : 'bg-muted text-muted-foreground cursor-not-allowed'
+                  : 'bg-muted text-muted-foreground cursor-not-allowed',
               )}
             >
               {isSubmitting ? (
@@ -364,5 +373,5 @@ export default function RegistrarEntregaPage() {
         />
       )}
     </AppLayout>
-  );
+  )
 }

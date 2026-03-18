@@ -1,24 +1,24 @@
-import { ReactNode, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Settings, 
-  Code2, 
+import { ReactNode, useState } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
+import {
+  LayoutDashboard,
+  Users,
+  Settings,
+  Code2,
   ClipboardList,
   ArrowLeft,
   Menu,
-  X
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useUserRole } from '@/hooks/useUserRole';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+  X,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { useUserRole } from '@/hooks/useUserRole'
+import { useQuery } from '@tanstack/react-query'
+import { supabase } from '@/integrations/supabase/client'
 
 interface AdminLayoutProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 const menuItems = [
@@ -51,25 +51,25 @@ const menuItems = [
     icon: ClipboardList,
     path: '/admin/logs',
   },
-];
+]
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
-  const location = useLocation();
-  
+  const location = useLocation()
+
   const { data: userCount } = useQuery({
     queryKey: ['admin-user-count'],
     queryFn: async () => {
       const { count } = await supabase
         .from('user_roles')
-        .select('*', { count: 'exact', head: true });
-      return count || 0;
+        .select('*', { count: 'exact', head: true })
+      return count || 0
     },
-  });
+  })
 
   const isActive = (path: string, exact?: boolean) => {
-    if (exact) return location.pathname === path;
-    return location.pathname.startsWith(path);
-  };
+    if (exact) return location.pathname === path
+    return location.pathname.startsWith(path)
+  }
 
   return (
     <div className="flex flex-col h-full bg-purple-700 text-white">
@@ -91,7 +91,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       {/* Menu */}
       <nav className="flex-1 py-4 overflow-y-auto">
         {menuItems.map((item) => {
-          const active = isActive(item.path, item.exact);
+          const active = isActive(item.path, item.exact)
           return (
             <NavLink
               key={item.path}
@@ -100,7 +100,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               className={cn(
                 'flex items-center gap-3 mx-3 px-4 py-3 rounded-lg transition-all',
                 'text-white/80 hover:bg-white/10',
-                active && 'bg-white/20 text-white border-l-4 border-white'
+                active && 'bg-white/20 text-white border-l-4 border-white',
               )}
             >
               <item.icon className="w-5 h-5" />
@@ -111,15 +111,17 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 </span>
               )}
               {item.badge && item.badge !== 'count' && (
-                <span className={cn(
-                  'ml-auto text-[10px] font-bold px-2 py-0.5 rounded',
-                  item.badgeColor || 'bg-purple-500'
-                )}>
+                <span
+                  className={cn(
+                    'ml-auto text-[10px] font-bold px-2 py-0.5 rounded',
+                    item.badgeColor || 'bg-purple-500',
+                  )}
+                >
                   {item.badge}
                 </span>
               )}
             </NavLink>
-          );
+          )
         })}
       </nav>
 
@@ -137,12 +139,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         </Button>
       </div>
     </div>
-  );
+  )
 }
 
 export function AdminLayout({ children }: AdminLayoutProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const { userName } = useUserRole();
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const { userName } = useUserRole()
 
   return (
     <div className="min-h-screen flex w-full bg-gray-50">
@@ -173,10 +175,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
       {/* Main Content */}
       <main className="flex-1 lg:ml-0 mt-14 lg:mt-0">
-        <div className="p-4 md:p-6 lg:p-8">
-          {children}
-        </div>
+        <div className="p-4 md:p-6 lg:p-8">{children}</div>
       </main>
     </div>
-  );
+  )
 }

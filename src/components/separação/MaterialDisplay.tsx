@@ -1,42 +1,61 @@
-import { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Package, FileText, Image, ExternalLink, Paperclip, Eye, Expand } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { useSeparacaoItens } from '@/hooks/useSeparacaoItens';
-import { useSeparacaoArquivos, SeparacaoArquivo } from '@/hooks/useSeparacaoArquivos';
+import { useState, useEffect } from 'react'
+import {
+  ChevronDown,
+  ChevronUp,
+  Package,
+  FileText,
+  Image,
+  ExternalLink,
+  Paperclip,
+  Eye,
+  Expand,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { useSeparacaoItens } from '@/hooks/useSeparacaoItens'
+import { useSeparacaoArquivos, SeparacaoArquivo } from '@/hooks/useSeparacaoArquivos'
 
 interface MaterialDisplayProps {
-  separacaoId: string;
-  materialTipo: string;
-  materialConteudo: string;
+  separacaoId: string
+  materialTipo: string
+  materialConteudo: string
 }
 
-export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }: MaterialDisplayProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const { items, isLoading } = useSeparacaoItens(isExpanded && materialTipo === 'tabela' ? separacaoId : null);
-  const { fetchArquivos } = useSeparacaoArquivos();
-  const [arquivos, setArquivos] = useState<SeparacaoArquivo[]>([]);
-  const [isLoadingArquivos, setIsLoadingArquivos] = useState(false);
+export function MaterialDisplay({
+  separacaoId,
+  materialTipo,
+  materialConteudo,
+}: MaterialDisplayProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const { items, isLoading } = useSeparacaoItens(
+    isExpanded && materialTipo === 'tabela' ? separacaoId : null,
+  )
+  const { fetchArquivos } = useSeparacaoArquivos()
+  const [arquivos, setArquivos] = useState<SeparacaoArquivo[]>([])
+  const [isLoadingArquivos, setIsLoadingArquivos] = useState(false)
 
   useEffect(() => {
-    if (isExpanded && (materialTipo === 'arquivos' || materialTipo === 'pdf' || materialTipo === 'imagem')) {
-      loadArquivos();
+    if (
+      isExpanded &&
+      (materialTipo === 'arquivos' || materialTipo === 'pdf' || materialTipo === 'imagem')
+    ) {
+      loadArquivos()
     }
-  }, [isExpanded, materialTipo, separacaoId]);
+  }, [isExpanded, materialTipo, separacaoId])
 
   const loadArquivos = async () => {
-    setIsLoadingArquivos(true);
-    const files = await fetchArquivos(separacaoId);
-    setArquivos(files);
-    setIsLoadingArquivos(false);
-  };
+    setIsLoadingArquivos(true)
+    const files = await fetchArquivos(separacaoId)
+    setArquivos(files)
+    setIsLoadingArquivos(false)
+  }
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '';
-    const mb = bytes / (1024 * 1024);
-    return mb >= 1 ? `${mb.toFixed(1)} MB` : `${(bytes / 1024).toFixed(0)} KB`;
-  };
+    if (bytes === 0) return ''
+    const mb = bytes / (1024 * 1024)
+    return mb >= 1 ? `${mb.toFixed(1)} MB` : `${(bytes / 1024).toFixed(0)} KB`
+  }
 
   const renderBadge = () => {
     if (materialTipo === 'tabela') {
@@ -45,34 +64,36 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
           <Package className="w-4 h-4" />
           {items.length > 0 ? `${items.length} itens` : 'Itens'}
         </span>
-      );
+      )
     }
-    
+
     if (materialTipo === 'arquivos') {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-light text-primary text-sm font-medium">
           <Paperclip className="w-4 h-4" />
-          {arquivos.length > 0 ? `${arquivos.length} arquivo${arquivos.length !== 1 ? 's' : ''}` : 'Arquivos'}
+          {arquivos.length > 0
+            ? `${arquivos.length} arquivo${arquivos.length !== 1 ? 's' : ''}`
+            : 'Arquivos'}
         </span>
-      );
+      )
     }
-    
+
     if (materialTipo === 'pdf') {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10 text-destructive text-sm font-medium">
           <FileText className="w-4 h-4" />
           PDF
         </span>
-      );
+      )
     }
-    
+
     if (materialTipo === 'imagem') {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-light text-primary text-sm font-medium">
           <Image className="w-4 h-4" />
           Imagem
         </span>
-      );
+      )
     }
 
     // texto type
@@ -81,8 +102,8 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
         <FileText className="w-4 h-4" />
         Texto
       </span>
-    );
-  };
+    )
+  }
 
   const renderExpandedContent = () => {
     if (materialTipo === 'tabela') {
@@ -93,7 +114,7 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
             <div className="h-4 bg-muted-foreground/20 rounded w-1/2 mb-2"></div>
             <div className="h-4 bg-muted-foreground/20 rounded w-1/4"></div>
           </div>
-        );
+        )
       }
 
       if (items.length === 0) {
@@ -101,7 +122,7 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
           <div className="mt-4 p-4 bg-muted rounded-lg text-center text-muted-foreground">
             Nenhum item encontrado
           </div>
-        );
+        )
       }
 
       return (
@@ -127,7 +148,9 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
                     <td className="p-2.5 font-medium">{item.codigo_produto}</td>
                     <td className="p-2.5">{item.referencia}</td>
                     <td className="p-2.5 max-w-[200px] truncate">{item.descricao}</td>
-                    <td className="p-2.5 text-right font-bold">{Number(item.quantidade).toFixed(2)}</td>
+                    <td className="p-2.5 text-right font-bold">
+                      {Number(item.quantidade).toFixed(2)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -142,7 +165,7 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
             </table>
           </div>
         </div>
-      );
+      )
     }
 
     // Handle arquivos type (multiple files)
@@ -153,7 +176,7 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
             <div className="h-12 bg-muted-foreground/20 rounded mb-2"></div>
             <div className="h-12 bg-muted-foreground/20 rounded mb-2"></div>
           </div>
-        );
+        )
       }
 
       if (arquivos.length === 0) {
@@ -161,16 +184,13 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
           <div className="mt-4 p-4 bg-muted rounded-lg text-center text-muted-foreground">
             Nenhum arquivo encontrado
           </div>
-        );
+        )
       }
 
       return (
         <div className="mt-4 space-y-2 animate-fade-in">
           {arquivos.map((arquivo) => (
-            <div
-              key={arquivo.id}
-              className="flex items-center gap-3 p-3 bg-muted rounded-lg"
-            >
+            <div key={arquivo.id} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
               {/* Icon */}
               <div className="w-8 h-8 rounded bg-background flex items-center justify-center flex-shrink-0">
                 {arquivo.tipo_arquivo === 'pdf' ? (
@@ -184,7 +204,9 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{arquivo.nome_arquivo}</p>
                 {arquivo.tamanho_bytes > 0 && (
-                  <p className="text-xs text-muted-foreground">{formatFileSize(arquivo.tamanho_bytes)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatFileSize(arquivo.tamanho_bytes)}
+                  </p>
                 )}
               </div>
 
@@ -194,9 +216,9 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
                 size="sm"
                 onClick={() => {
                   if (arquivo.tipo_arquivo === 'pdf') {
-                    window.open(arquivo.url_arquivo, '_blank');
+                    window.open(arquivo.url_arquivo, '_blank')
                   } else {
-                    setImagePreview(arquivo.url_arquivo);
+                    setImagePreview(arquivo.url_arquivo)
                   }
                 }}
                 className="h-8 px-2 text-primary"
@@ -210,7 +232,7 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
             </div>
           ))}
         </div>
-      );
+      )
     }
 
     // Legacy: single pdf or imagem type
@@ -220,10 +242,7 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
         return (
           <div className="mt-4 space-y-2 animate-fade-in">
             {arquivos.map((arquivo) => (
-              <div
-                key={arquivo.id}
-                className="flex items-center gap-3 p-3 bg-muted rounded-lg"
-              >
+              <div key={arquivo.id} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                 <div className="w-8 h-8 rounded bg-background flex items-center justify-center flex-shrink-0">
                   {arquivo.tipo_arquivo === 'pdf' ? (
                     <FileText className="w-5 h-5 text-red-500" />
@@ -239,9 +258,9 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
                   size="sm"
                   onClick={() => {
                     if (arquivo.tipo_arquivo === 'pdf') {
-                      window.open(arquivo.url_arquivo, '_blank');
+                      window.open(arquivo.url_arquivo, '_blank')
                     } else {
-                      setImagePreview(arquivo.url_arquivo);
+                      setImagePreview(arquivo.url_arquivo)
                     }
                   }}
                   className="h-8 px-2 text-primary"
@@ -255,7 +274,7 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
               </div>
             ))}
           </div>
-        );
+        )
       }
 
       // Fallback to old materialConteudo field
@@ -281,7 +300,7 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
             </a>
           )}
         </div>
-      );
+      )
     }
 
     // texto type
@@ -292,11 +311,11 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
             {materialConteudo}
           </pre>
         </div>
-      );
+      )
     }
 
-    return null;
-  };
+    return null
+  }
 
   return (
     <>
@@ -342,5 +361,5 @@ export function MaterialDisplay({ separacaoId, materialTipo, materialConteudo }:
         </DialogContent>
       </Dialog>
     </>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo } from 'react'
 import {
   startOfMonth,
   endOfMonth,
@@ -9,31 +9,31 @@ import {
   isSameMonth,
   isSameDay,
   isToday,
-} from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { cn } from '@/lib/utils';
-import { MonthData, DayData } from '@/hooks/useCalendarData';
-import { Flame } from 'lucide-react';
+} from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import { cn } from '@/lib/utils'
+import { MonthData, DayData } from '@/hooks/useCalendarData'
+import { Flame } from 'lucide-react'
 
 interface CalendarGridProps {
-  currentMonth: Date;
-  selectedDate: Date | null;
-  onSelectDate: (date: Date) => void;
-  monthData: MonthData;
-  isLoading: boolean;
+  currentMonth: Date
+  selectedDate: Date | null
+  onSelectDate: (date: Date) => void
+  monthData: MonthData
+  isLoading: boolean
 }
 
-const WEEK_DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const WEEK_DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
 // Progressive badge styles based on status and complexity
 function getProgressiveBadge(
   status: 'material_solicitado' | 'em_separacao' | 'separado',
   nivel: 'facil' | 'medio' | 'dificil' | null,
   count: number,
-  isSelected: boolean
+  isSelected: boolean,
 ) {
-  const complexity = nivel || 'medio';
-  
+  const complexity = nivel || 'medio'
+
   // Color palette based on complexity
   const colors = {
     facil: {
@@ -57,9 +57,9 @@ function getProgressiveBadge(
       text: '#991b1b', // red-800
       textLight: '#fee2e2',
     },
-  };
+  }
 
-  const c = colors[complexity];
+  const c = colors[complexity]
 
   // Status-based styling (progressive)
   const styles: Record<typeof status, React.CSSProperties> = {
@@ -105,17 +105,17 @@ function getProgressiveBadge(
       fontWeight: 'bold',
       boxShadow: `0 2px 4px ${c.bgLight}`,
     },
-  };
+  }
 
   if (isSelected) {
     return {
       ...styles[status],
       background: status === 'separado' ? c.bgSolid : 'rgba(255,255,255,0.9)',
       color: status === 'separado' ? 'white' : c.text,
-    };
+    }
   }
 
-  return styles[status];
+  return styles[status]
 }
 
 export function CalendarGrid({
@@ -126,39 +126,39 @@ export function CalendarGrid({
   isLoading,
 }: CalendarGridProps) {
   const calendarDays = useMemo(() => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    const calendarStart = startOfWeek(monthStart, { locale: ptBR });
-    const calendarEnd = endOfWeek(monthEnd, { locale: ptBR });
+    const monthStart = startOfMonth(currentMonth)
+    const monthEnd = endOfMonth(currentMonth)
+    const calendarStart = startOfWeek(monthStart, { locale: ptBR })
+    const calendarEnd = endOfWeek(monthEnd, { locale: ptBR })
 
-    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
-  }, [currentMonth]);
+    return eachDayOfInterval({ start: calendarStart, end: calendarEnd })
+  }, [currentMonth])
 
   const getDayData = (date: Date) => {
-    const dateKey = format(date, 'yyyy-MM-dd');
-    return monthData[dateKey];
-  };
+    const dateKey = format(date, 'yyyy-MM-dd')
+    return monthData[dateKey]
+  }
 
   // Group deliveries by status AND complexity for individual badges per level
   // ONLY shows the 3 main statuses: material_solicitado, em_separacao, separado
   const getGroupedBadges = (dayData: DayData, isSelected: boolean) => {
-    const badges: JSX.Element[] = [];
-    
+    const badges: JSX.Element[] = []
+
     // Group by status and complexity - ONLY 3 main statuses
     const getCountsByComplexity = (status: string) => {
-      const entregas = dayData.entregas.filter(e => e.status === status);
-      const counts = { facil: 0, medio: 0, dificil: 0 };
-      entregas.forEach(e => {
-        const nivel = (e.nivel_complexidade || 'medio') as keyof typeof counts;
-        if (counts[nivel] !== undefined) counts[nivel]++;
-      });
-      return counts;
-    };
+      const entregas = dayData.entregas.filter((e) => e.status === status)
+      const counts = { facil: 0, medio: 0, dificil: 0 }
+      entregas.forEach((e) => {
+        const nivel = (e.nivel_complexidade || 'medio') as keyof typeof counts
+        if (counts[nivel] !== undefined) counts[nivel]++
+      })
+      return counts
+    }
 
     // Material Solicitado - show separate badge per complexity
     if (dayData.materialSolicitado > 0) {
-      const counts = getCountsByComplexity('material_solicitado');
-      (['facil', 'medio', 'dificil'] as const).forEach(nivel => {
+      const counts = getCountsByComplexity('material_solicitado')
+      ;(['facil', 'medio', 'dificil'] as const).forEach((nivel) => {
         if (counts[nivel] > 0) {
           badges.push(
             <div
@@ -166,16 +166,16 @@ export function CalendarGrid({
               style={getProgressiveBadge('material_solicitado', nivel, counts[nivel], isSelected)}
             >
               {counts[nivel]}
-            </div>
-          );
+            </div>,
+          )
         }
-      });
+      })
     }
 
     // Em Separação - show separate badge per complexity
     if (dayData.emSeparacao > 0) {
-      const counts = getCountsByComplexity('em_separacao');
-      (['facil', 'medio', 'dificil'] as const).forEach(nivel => {
+      const counts = getCountsByComplexity('em_separacao')
+      ;(['facil', 'medio', 'dificil'] as const).forEach((nivel) => {
         if (counts[nivel] > 0) {
           badges.push(
             <div
@@ -183,16 +183,16 @@ export function CalendarGrid({
               style={getProgressiveBadge('em_separacao', nivel, counts[nivel], isSelected)}
             >
               {counts[nivel]}
-            </div>
-          );
+            </div>,
+          )
         }
-      });
+      })
     }
 
     // Separado - show separate badge per complexity
     if (dayData.separado > 0) {
-      const counts = getCountsByComplexity('separado');
-      (['facil', 'medio', 'dificil'] as const).forEach(nivel => {
+      const counts = getCountsByComplexity('separado')
+      ;(['facil', 'medio', 'dificil'] as const).forEach((nivel) => {
         if (counts[nivel] > 0) {
           badges.push(
             <div
@@ -200,17 +200,17 @@ export function CalendarGrid({
               style={getProgressiveBadge('separado', nivel, counts[nivel], isSelected)}
             >
               {counts[nivel]}
-            </div>
-          );
+            </div>,
+          )
         }
-      });
+      })
     }
 
     // NOTE: Garantia, Pendente, and Finalizado badges REMOVED from calendar
     // These statuses are handled in other areas (/pendentes, /entregas-finalizadas)
 
-    return badges;
-  };
+    return badges
+  }
 
   if (isLoading) {
     return (
@@ -226,7 +226,7 @@ export function CalendarGrid({
           ))}
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -246,12 +246,12 @@ export function CalendarGrid({
       {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-1">
         {calendarDays.map((day) => {
-          const isCurrentMonth = isSameMonth(day, currentMonth);
-          const isSelected = selectedDate && isSameDay(day, selectedDate);
-          const isTodayDate = isToday(day);
-          const dayData = getDayData(day);
-          const hasDeliveries = dayData && dayData.total > 0;
-          const isHighDensity = dayData && dayData.total >= 7;
+          const isCurrentMonth = isSameMonth(day, currentMonth)
+          const isSelected = selectedDate && isSameDay(day, selectedDate)
+          const isTodayDate = isToday(day)
+          const dayData = getDayData(day)
+          const hasDeliveries = dayData && dayData.total > 0
+          const isHighDensity = dayData && dayData.total >= 7
 
           return (
             <div
@@ -261,10 +261,12 @@ export function CalendarGrid({
                 'min-h-[80px] md:min-h-[100px] p-1 md:p-2 rounded-lg border transition-all duration-200 flex flex-col items-center',
                 !isCurrentMonth && 'opacity-40 cursor-default',
                 isCurrentMonth && !hasDeliveries && 'cursor-default',
-                isCurrentMonth && hasDeliveries && 'cursor-pointer hover:bg-primary/5 hover:border-primary',
+                isCurrentMonth &&
+                  hasDeliveries &&
+                  'cursor-pointer hover:bg-primary/5 hover:border-primary',
                 isSelected && 'bg-primary text-primary-foreground border-primary',
                 isTodayDate && !isSelected && 'border-2 border-primary bg-primary/5',
-                !isSelected && !isTodayDate && 'border-border bg-card'
+                !isSelected && !isTodayDate && 'border-border bg-card',
               )}
             >
               {/* Day number */}
@@ -274,7 +276,7 @@ export function CalendarGrid({
                   !isCurrentMonth && 'text-muted-foreground',
                   isCurrentMonth && !hasDeliveries && 'text-muted-foreground',
                   isCurrentMonth && hasDeliveries && 'text-foreground',
-                  isSelected && 'text-primary-foreground'
+                  isSelected && 'text-primary-foreground',
                 )}
               >
                 {format(day, 'd')}
@@ -290,9 +292,9 @@ export function CalendarGrid({
                 </div>
               )}
             </div>
-          );
+          )
         })}
       </div>
     </div>
-  );
+  )
 }

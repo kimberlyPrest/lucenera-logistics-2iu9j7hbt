@@ -1,23 +1,23 @@
-import { useState } from 'react';
-import { Plus, Pencil, Trash2, GripVertical, Package } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useState } from 'react'
+import { Plus, Pencil, Trash2, GripVertical, Package } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 export interface TableItem {
-  id: string;
-  ordem: number;
-  id_lote: string;
-  codigo_produto: string;
-  referencia: string;
-  descricao: string;
-  quantidade: number;
-  local?: string;
-  marca?: string;
+  id: string
+  ordem: number
+  id_lote: string
+  codigo_produto: string
+  referencia: string
+  descricao: string
+  quantidade: number
+  local?: string
+  marca?: string
 }
 
 interface ItemsTableInputProps {
-  items: TableItem[];
-  onItemsChange: (items: TableItem[]) => void;
+  items: TableItem[]
+  onItemsChange: (items: TableItem[]) => void
 }
 
 export function ItemsTableInput({ items, onItemsChange }: ItemsTableInputProps) {
@@ -27,33 +27,33 @@ export function ItemsTableInput({ items, onItemsChange }: ItemsTableInputProps) 
     referencia: '',
     descricao: '',
     quantidade: '',
-  });
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  })
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const validateItem = () => {
-    const newErrors: Record<string, string> = {};
-    
+    const newErrors: Record<string, string> = {}
+
     if (newItem.codigo_produto.length < 3) {
-      newErrors.codigo_produto = 'Mínimo 3 caracteres';
+      newErrors.codigo_produto = 'Mínimo 3 caracteres'
     }
     if (newItem.referencia.length < 3) {
-      newErrors.referencia = 'Mínimo 3 caracteres';
+      newErrors.referencia = 'Mínimo 3 caracteres'
     }
     if (newItem.descricao.length < 5) {
-      newErrors.descricao = 'Mínimo 5 caracteres';
+      newErrors.descricao = 'Mínimo 5 caracteres'
     }
-    const qty = parseFloat(newItem.quantidade.replace(',', '.'));
+    const qty = parseFloat(newItem.quantidade.replace(',', '.'))
     if (isNaN(qty) || qty <= 0) {
-      newErrors.quantidade = 'Quantidade inválida';
+      newErrors.quantidade = 'Quantidade inválida'
     }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const addItem = () => {
-    if (!validateItem()) return;
+    if (!validateItem()) return
 
     const item: TableItem = {
       id: crypto.randomUUID(),
@@ -63,42 +63,38 @@ export function ItemsTableInput({ items, onItemsChange }: ItemsTableInputProps) 
       referencia: newItem.referencia,
       descricao: newItem.descricao,
       quantidade: parseFloat(newItem.quantidade.replace(',', '.')),
-    };
+    }
 
-    onItemsChange([...items, item]);
+    onItemsChange([...items, item])
     setNewItem({
       id_lote: '',
       codigo_produto: '',
       referencia: '',
       descricao: '',
       quantidade: '',
-    });
-    setErrors({});
-  };
+    })
+    setErrors({})
+  }
 
   const removeItem = (id: string) => {
-    const filtered = items.filter(item => item.id !== id);
+    const filtered = items.filter((item) => item.id !== id)
     const reordered = filtered.map((item, index) => ({
       ...item,
       ordem: index + 1,
-    }));
-    onItemsChange(reordered);
-  };
+    }))
+    onItemsChange(reordered)
+  }
 
   const updateItem = (id: string, field: keyof TableItem, value: string | number) => {
-    onItemsChange(
-      items.map(item =>
-        item.id === id ? { ...item, [field]: value } : item
-      )
-    );
-  };
+    onItemsChange(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
+  }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      e.preventDefault();
-      addItem();
+      e.preventDefault()
+      addItem()
     }
-  };
+  }
 
   return (
     <div className="space-y-4">
@@ -108,7 +104,7 @@ export function ItemsTableInput({ items, onItemsChange }: ItemsTableInputProps) 
           <Input
             placeholder="ID Lote"
             value={newItem.id_lote}
-            onChange={e => setNewItem({ ...newItem, id_lote: e.target.value })}
+            onChange={(e) => setNewItem({ ...newItem, id_lote: e.target.value })}
             className="w-20 h-12"
           />
         </div>
@@ -116,7 +112,7 @@ export function ItemsTableInput({ items, onItemsChange }: ItemsTableInputProps) 
           <Input
             placeholder="Código *"
             value={newItem.codigo_produto}
-            onChange={e => setNewItem({ ...newItem, codigo_produto: e.target.value })}
+            onChange={(e) => setNewItem({ ...newItem, codigo_produto: e.target.value })}
             onKeyPress={handleKeyPress}
             className={`w-28 h-12 ${errors.codigo_produto ? 'border-destructive' : ''}`}
           />
@@ -128,7 +124,7 @@ export function ItemsTableInput({ items, onItemsChange }: ItemsTableInputProps) 
           <Input
             placeholder="Referência *"
             value={newItem.referencia}
-            onChange={e => setNewItem({ ...newItem, referencia: e.target.value })}
+            onChange={(e) => setNewItem({ ...newItem, referencia: e.target.value })}
             onKeyPress={handleKeyPress}
             className={`w-36 h-12 ${errors.referencia ? 'border-destructive' : ''}`}
           />
@@ -140,7 +136,7 @@ export function ItemsTableInput({ items, onItemsChange }: ItemsTableInputProps) 
           <Input
             placeholder="Descrição *"
             value={newItem.descricao}
-            onChange={e => setNewItem({ ...newItem, descricao: e.target.value })}
+            onChange={(e) => setNewItem({ ...newItem, descricao: e.target.value })}
             onKeyPress={handleKeyPress}
             className={`h-12 ${errors.descricao ? 'border-destructive' : ''}`}
           />
@@ -152,7 +148,7 @@ export function ItemsTableInput({ items, onItemsChange }: ItemsTableInputProps) 
           <Input
             placeholder="Qtde *"
             value={newItem.quantidade}
-            onChange={e => setNewItem({ ...newItem, quantidade: e.target.value })}
+            onChange={(e) => setNewItem({ ...newItem, quantidade: e.target.value })}
             onKeyPress={handleKeyPress}
             className={`w-24 h-12 ${errors.quantidade ? 'border-destructive' : ''}`}
           />
@@ -198,7 +194,9 @@ export function ItemsTableInput({ items, onItemsChange }: ItemsTableInputProps) 
                     <td className="p-3 text-sm font-medium">{item.codigo_produto}</td>
                     <td className="p-3 text-sm">{item.referencia}</td>
                     <td className="p-3 text-sm max-w-xs truncate">{item.descricao}</td>
-                    <td className="p-3 text-sm font-bold text-right">{item.quantidade.toFixed(2)}</td>
+                    <td className="p-3 text-sm font-bold text-right">
+                      {item.quantidade.toFixed(2)}
+                    </td>
                     <td className="p-3">
                       <div className="flex items-center justify-center gap-1">
                         <button
@@ -245,5 +243,5 @@ export function ItemsTableInput({ items, onItemsChange }: ItemsTableInputProps) 
         </div>
       )}
     </div>
-  );
+  )
 }

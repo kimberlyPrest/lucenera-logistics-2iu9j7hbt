@@ -1,13 +1,13 @@
-import { Package } from 'lucide-react';
+import { Package } from 'lucide-react'
 
 interface EmptyStateProps {
-  title?: string;
-  subtitle?: string;
+  title?: string
+  subtitle?: string
 }
 
-export function EmptyState({ 
+export function EmptyState({
   title = 'Nenhuma entrega encontrada',
-  subtitle = 'Selecione outro período no filtro acima'
+  subtitle = 'Selecione outro período no filtro acima',
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -17,5 +17,5 @@ export function EmptyState({
       <h3 className="text-lg font-semibold text-muted-foreground mb-1">{title}</h3>
       <p className="text-sm text-muted-foreground/70">{subtitle}</p>
     </div>
-  );
+  )
 }

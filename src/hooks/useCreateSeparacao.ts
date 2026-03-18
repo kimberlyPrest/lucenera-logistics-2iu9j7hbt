@@ -1,77 +1,77 @@
-import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react'
+import { supabase } from '@/integrations/supabase/client'
+import { useToast } from '@/hooks/use-toast'
 
 // Updated to match new database constraint: 'tabela', 'arquivos', or null
-export type MaterialTipo = 'tabela' | 'arquivos';
+export type MaterialTipo = 'tabela' | 'arquivos'
 
 export interface SeparacaoItem {
-  id: string;
-  ordem: number;
-  id_lote: string;
-  codigo_produto: string;
-  referencia: string;
-  descricao: string;
-  quantidade: number;
-  local?: string;
-  marca?: string;
+  id: string
+  ordem: number
+  id_lote: string
+  codigo_produto: string
+  referencia: string
+  descricao: string
+  quantidade: number
+  local?: string
+  marca?: string
 }
 
-export type DeliveryType = 'flexible' | 'scheduled';
+export type DeliveryType = 'flexible' | 'scheduled'
 
 export interface CreateSeparacaoData {
-  codigo_obra: string;
-  numero_pedido?: string;
-  vendedor?: string;
-  gestora_equipe: string;
-  cliente: string;
-  data_entrega: string;
-  responsavel_recebimento: string;
-  telefone: string;
-  endereco: string;
-  material_tipo: MaterialTipo;
-  material_conteudo: string | null;
-  delivery_type: DeliveryType;
-  scheduled_time?: string | null;
-  items?: SeparacaoItem[];
+  codigo_obra: string
+  numero_pedido?: string
+  vendedor?: string
+  gestora_equipe: string
+  cliente: string
+  data_entrega: string
+  responsavel_recebimento: string
+  telefone: string
+  endereco: string
+  material_tipo: MaterialTipo
+  material_conteudo: string | null
+  delivery_type: DeliveryType
+  scheduled_time?: string | null
+  items?: SeparacaoItem[]
 }
 
 export function useCreateSeparacao() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { toast } = useToast()
 
   // Removed auto-generation - user now inputs codigo manually
 
   const uploadMaterial = async (
     file: File,
     codigoObra: string,
-    tipo: 'pdf' | 'imagem'
+    tipo: 'pdf' | 'imagem',
   ): Promise<string> => {
-    const extension = file.name.split('.').pop() || (tipo === 'pdf' ? 'pdf' : 'jpg');
-    const filePath = `${codigoObra}/material.${extension}`;
+    const extension = file.name.split('.').pop() || (tipo === 'pdf' ? 'pdf' : 'jpg')
+    const filePath = `${codigoObra}/material.${extension}`
 
     const { error: uploadError } = await supabase.storage
       .from('materiais-separacao')
-      .upload(filePath, file);
+      .upload(filePath, file)
 
     if (uploadError) {
-      throw new Error(`Erro ao enviar arquivo: ${uploadError.message}`);
+      throw new Error(`Erro ao enviar arquivo: ${uploadError.message}`)
     }
 
     // Get signed URL (expires in 7 days)
     const { data: urlData, error: signError } = await supabase.storage
       .from('materiais-separacao')
-      .createSignedUrl(filePath, 604800); // 7 days
+      .createSignedUrl(filePath, 604800) // 7 days
 
     if (signError) {
-      throw new Error(`Erro ao gerar URL do arquivo: ${signError.message}`);
+      throw new Error(`Erro ao gerar URL do arquivo: ${signError.message}`)
     }
 
-    return urlData.signedUrl;
-  };
+    return urlData.signedUrl
+  }
 
   const createSeparacao = async (data: CreateSeparacaoData): Promise<boolean> => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
     try {
       // Step 1: Insert main separacao record
@@ -94,10 +94,10 @@ export function useCreateSeparacao() {
           status: 'material_solicitado', // Valid status per separacoes_status_check constraint
         })
         .select('id')
-        .single();
+        .single()
 
       if (insertError) {
-        throw new Error(`Erro ao criar separação: ${insertError.message}`);
+        throw new Error(`Erro ao criar separação: ${insertError.message}`)
       }
 
       // Step 2: If material_tipo is 'tabela', insert items
@@ -112,16 +112,14 @@ export function useCreateSeparacao() {
           quantidade: item.quantidade,
           local: item.local || null,
           marca: item.marca || null,
-        }));
+        }))
 
-        const { error: itemsError } = await supabase
-          .from('separacao_itens')
-          .insert(itemsToInsert);
+        const { error: itemsError } = await supabase.from('separacao_itens').insert(itemsToInsert)
 
         if (itemsError) {
           // Rollback: delete the separacao
-          await supabase.from('separacoes').delete().eq('id', separacaoData.id);
-          throw new Error(`Erro ao salvar itens: ${itemsError.message}`);
+          await supabase.from('separacoes').delete().eq('id', separacaoData.id)
+          throw new Error(`Erro ao salvar itens: ${itemsError.message}`)
         }
       }
 
@@ -130,29 +128,29 @@ export function useCreateSeparacao() {
         title: `Separação ${data.codigo_obra} criada com sucesso! 📦`,
         description: 'A nova separação foi adicionada à lista.',
         className: 'bg-success text-success-foreground border-none',
-      });
+      })
 
       if (navigator.vibrate) {
-        navigator.vibrate(200);
+        navigator.vibrate(200)
       }
 
-      return true;
+      return true
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Erro ao criar separação';
+      const message = err instanceof Error ? err.message : 'Erro ao criar separação'
       toast({
         title: 'Erro ao criar separação',
         description: message,
         variant: 'destructive',
-      });
-      return false;
+      })
+      return false
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return {
     createSeparacao,
     uploadMaterial,
     isSubmitting,
-  };
+  }
 }

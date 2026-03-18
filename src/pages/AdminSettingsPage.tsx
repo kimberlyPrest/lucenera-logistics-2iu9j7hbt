@@ -1,28 +1,28 @@
-import { useState } from 'react';
-import { AdminLayout } from '@/components/admin/AdminLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Truck, 
-  MapPin, 
-  Users, 
-  Bell, 
-  Link2, 
+import { useState } from 'react'
+import { AdminLayout } from '@/components/admin/AdminLayout'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Slider } from '@/components/ui/slider'
+import { Switch } from '@/components/ui/switch'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
+import {
+  Truck,
+  MapPin,
+  Users,
+  Bell,
+  Link2,
   Database,
   Clock,
   Pencil,
   Check,
   X,
   Save,
-  ExternalLink
-} from 'lucide-react';
-import { toast } from 'sonner';
+  ExternalLink,
+} from 'lucide-react'
+import { toast } from 'sonner'
 
 const GESTORAS = [
   { id: 1, nome: 'Thais Gomes', ativo: true },
@@ -30,42 +30,42 @@ const GESTORAS = [
   { id: 3, nome: 'Marina Pousa', ativo: true },
   { id: 4, nome: 'Vinicius', ativo: true },
   { id: 5, nome: 'Terezinha', ativo: true },
-];
+]
 
 export default function AdminSettingsPage() {
   // Delivery settings
-  const [tempoEntrega, setTempoEntrega] = useState(30);
-  const [horarioInicio, setHorarioInicio] = useState('08:00');
-  const [raioAtendimento, setRaioAtendimento] = useState(50);
-  
+  const [tempoEntrega, setTempoEntrega] = useState(30)
+  const [horarioInicio, setHorarioInicio] = useState('08:00')
+  const [raioAtendimento, setRaioAtendimento] = useState(50)
+
   // Address settings
-  const [endereco, setEndereco] = useState('R. Dr. Hugo Fortes, 1010 – Parque Industrial Lagoinha – Ribeirão Preto/SP');
-  const [editandoEndereco, setEditandoEndereco] = useState(false);
-  
+  const [endereco, setEndereco] = useState(
+    'R. Dr. Hugo Fortes, 1010 – Parque Industrial Lagoinha – Ribeirão Preto/SP',
+  )
+  const [editandoEndereco, setEditandoEndereco] = useState(false)
+
   // Notifications
-  const [notifCriarSeparacao, setNotifCriarSeparacao] = useState(true);
-  const [notifFinalizarEntrega, setNotifFinalizarEntrega] = useState(true);
-  
+  const [notifCriarSeparacao, setNotifCriarSeparacao] = useState(true)
+  const [notifFinalizarEntrega, setNotifFinalizarEntrega] = useState(true)
+
   // Integrations
-  const [googleMapsConfigured, setGoogleMapsConfigured] = useState(true);
-  const [geminiConfigured, setGeminiConfigured] = useState(true);
+  const [googleMapsConfigured, setGoogleMapsConfigured] = useState(true)
+  const [geminiConfigured, setGeminiConfigured] = useState(true)
 
   const handleSaveDeliverySettings = () => {
-    toast.success('Configurações de entrega salvas!');
-  };
+    toast.success('Configurações de entrega salvas!')
+  }
 
   const handleSaveAddress = () => {
-    setEditandoEndereco(false);
-    toast.success('Endereço atualizado com sucesso!');
-  };
+    setEditandoEndereco(false)
+    toast.success('Endereço atualizado com sucesso!')
+  }
 
   return (
     <AdminLayout>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-purple-700">
-          Configurações do Sistema
-        </h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-purple-700">Configurações do Sistema</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Personalize o funcionamento da Lucenera
         </p>
@@ -117,9 +117,7 @@ export default function AdminSettingsPage() {
                 onChange={(e) => setHorarioInicio(e.target.value)}
                 className="w-32"
               />
-              <p className="text-xs text-muted-foreground">
-                Sugerido ao criar rotas
-              </p>
+              <p className="text-xs text-muted-foreground">Sugerido ao criar rotas</p>
             </div>
 
             {/* Raio de Atendimento */}
@@ -140,7 +138,10 @@ export default function AdminSettingsPage() {
               </p>
             </div>
 
-            <Button onClick={handleSaveDeliverySettings} className="bg-purple-600 hover:bg-purple-700">
+            <Button
+              onClick={handleSaveDeliverySettings}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
               <Save className="w-4 h-4 mr-2" />
               Salvar Configurações
             </Button>
@@ -166,15 +167,15 @@ export default function AdminSettingsPage() {
                     className="min-h-[80px]"
                   />
                   <div className="flex gap-2">
-                    <Button onClick={handleSaveAddress} size="sm" className="bg-green-600 hover:bg-green-700">
+                    <Button
+                      onClick={handleSaveAddress}
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700"
+                    >
                       <Check className="w-4 h-4 mr-1" />
                       Salvar
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setEditandoEndereco(false)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => setEditandoEndereco(false)}>
                       <X className="w-4 h-4 mr-1" />
                       Cancelar
                     </Button>
@@ -183,11 +184,7 @@ export default function AdminSettingsPage() {
               ) : (
                 <div className="flex items-start justify-between gap-4 p-3 bg-muted rounded-lg">
                   <p className="text-sm">{endereco}</p>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => setEditandoEndereco(true)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => setEditandoEndereco(true)}>
                     <Pencil className="w-4 h-4" />
                   </Button>
                 </div>
@@ -206,9 +203,9 @@ export default function AdminSettingsPage() {
             </div>
 
             <Button variant="outline" asChild>
-              <a 
-                href="https://www.google.com/maps/search/-21.1767,-47.8208" 
-                target="_blank" 
+              <a
+                href="https://www.google.com/maps/search/-21.1767,-47.8208"
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
@@ -229,7 +226,7 @@ export default function AdminSettingsPage() {
           <CardContent>
             <div className="space-y-3">
               {GESTORAS.map((gestora) => (
-                <div 
+                <div
                   key={gestora.id}
                   className="flex items-center justify-between p-3 bg-muted rounded-lg"
                 >
@@ -244,7 +241,8 @@ export default function AdminSettingsPage() {
               ))}
             </div>
             <p className="text-xs text-muted-foreground mt-4">
-              Lista fixa de gestoras. Funcionalidade de adicionar novas gestoras será implementada futuramente.
+              Lista fixa de gestoras. Funcionalidade de adicionar novas gestoras será implementada
+              futuramente.
             </p>
           </CardContent>
         </Card>
@@ -261,22 +259,20 @@ export default function AdminSettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <Label>Enviar email ao criar separação</Label>
-                <p className="text-xs text-muted-foreground">Notificar responsáveis quando nova separação é criada</p>
+                <p className="text-xs text-muted-foreground">
+                  Notificar responsáveis quando nova separação é criada
+                </p>
               </div>
-              <Switch
-                checked={notifCriarSeparacao}
-                onCheckedChange={setNotifCriarSeparacao}
-              />
+              <Switch checked={notifCriarSeparacao} onCheckedChange={setNotifCriarSeparacao} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <Label>Notificar ao finalizar entrega</Label>
-                <p className="text-xs text-muted-foreground">Enviar confirmação quando entrega é registrada</p>
+                <p className="text-xs text-muted-foreground">
+                  Enviar confirmação quando entrega é registrada
+                </p>
               </div>
-              <Switch
-                checked={notifFinalizarEntrega}
-                onCheckedChange={setNotifFinalizarEntrega}
-              />
+              <Switch checked={notifFinalizarEntrega} onCheckedChange={setNotifFinalizarEntrega} />
             </div>
             <p className="text-xs text-muted-foreground border-t pt-4">
               ⚠️ Funcionalidade de notificações por email será implementada futuramente.
@@ -319,7 +315,7 @@ export default function AdminSettingsPage() {
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                   <svg className="w-5 h-5 text-purple-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                   </svg>
                 </div>
                 <div>
@@ -377,5 +373,5 @@ export default function AdminSettingsPage() {
         </Card>
       </div>
     </AdminLayout>
-  );
+  )
 }

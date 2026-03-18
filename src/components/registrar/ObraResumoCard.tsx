@@ -1,40 +1,59 @@
-import { useState, useEffect } from 'react';
-import { Check, MapPin, User, Phone, Package, Paperclip, FileText, Image, Eye, Expand, ChevronDown, ChevronUp, AlertTriangle, Star } from 'lucide-react';
-import { Separacao } from '@/hooks/useSeparacoes';
-import { useSeparacaoItens } from '@/hooks/useSeparacaoItens';
-import { useSeparacaoArquivos, SeparacaoArquivo } from '@/hooks/useSeparacaoArquivos';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { useState, useEffect } from 'react'
+import {
+  Check,
+  MapPin,
+  User,
+  Phone,
+  Package,
+  Paperclip,
+  FileText,
+  Image,
+  Eye,
+  Expand,
+  ChevronDown,
+  ChevronUp,
+  AlertTriangle,
+  Star,
+} from 'lucide-react'
+import { Separacao } from '@/hooks/useSeparacoes'
+import { useSeparacaoItens } from '@/hooks/useSeparacaoItens'
+import { useSeparacaoArquivos, SeparacaoArquivo } from '@/hooks/useSeparacaoArquivos'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 interface ObraResumoCardProps {
-  separacao: Separacao;
+  separacao: Separacao
 }
 
 export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
-  const [showAllMaterial, setShowAllMaterial] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const { items } = useSeparacaoItens(separacao.material_tipo === 'tabela' ? separacao.id : null);
-  const { fetchArquivos } = useSeparacaoArquivos();
-  const [arquivos, setArquivos] = useState<SeparacaoArquivo[]>([]);
+  const [showAllMaterial, setShowAllMaterial] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const { items } = useSeparacaoItens(separacao.material_tipo === 'tabela' ? separacao.id : null)
+  const { fetchArquivos } = useSeparacaoArquivos()
+  const [arquivos, setArquivos] = useState<SeparacaoArquivo[]>([])
 
   useEffect(() => {
-    if (separacao.material_tipo === 'arquivos' || separacao.material_tipo === 'pdf' || separacao.material_tipo === 'imagem') {
-      loadArquivos();
+    if (
+      separacao.material_tipo === 'arquivos' ||
+      separacao.material_tipo === 'pdf' ||
+      separacao.material_tipo === 'imagem'
+    ) {
+      loadArquivos()
     }
-  }, [separacao.id, separacao.material_tipo]);
+  }, [separacao.id, separacao.material_tipo])
 
   const loadArquivos = async () => {
-    const files = await fetchArquivos(separacao.id);
-    setArquivos(files);
-  };
+    const files = await fetchArquivos(separacao.id)
+    setArquivos(files)
+  }
 
   const handleCall = () => {
-    window.open(`tel:${separacao.telefone.replace(/\D/g, '')}`, '_self');
-  };
+    window.open(`tel:${separacao.telefone.replace(/\D/g, '')}`, '_self')
+  }
 
   const renderMaterialContent = () => {
     if (separacao.material_tipo === 'tabela') {
-      const displayItems = showAllMaterial ? items : items.slice(0, 5);
+      const displayItems = showAllMaterial ? items : items.slice(0, 5)
       return (
         <div className="space-y-2">
           {items.length > 0 ? (
@@ -45,8 +64,13 @@ export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
               </div>
               <div className="space-y-1">
                 {displayItems.map((item) => (
-                  <div key={item.id} className="text-xs bg-muted/50 rounded px-2 py-1.5 flex justify-between">
-                    <span className="truncate flex-1">{item.codigo_produto} - {item.descricao}</span>
+                  <div
+                    key={item.id}
+                    className="text-xs bg-muted/50 rounded px-2 py-1.5 flex justify-between"
+                  >
+                    <span className="truncate flex-1">
+                      {item.codigo_produto} - {item.descricao}
+                    </span>
                     <span className="font-semibold ml-2">{Number(item.quantidade).toFixed(0)}</span>
                   </div>
                 ))}
@@ -59,9 +83,13 @@ export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
                   className="w-full text-primary text-xs h-7"
                 >
                   {showAllMaterial ? (
-                    <>Mostrar menos <ChevronUp className="w-3 h-3 ml-1" /></>
+                    <>
+                      Mostrar menos <ChevronUp className="w-3 h-3 ml-1" />
+                    </>
                   ) : (
-                    <>+ {items.length - 5} itens <ChevronDown className="w-3 h-3 ml-1" /></>
+                    <>
+                      + {items.length - 5} itens <ChevronDown className="w-3 h-3 ml-1" />
+                    </>
                   )}
                 </Button>
               )}
@@ -70,18 +98,24 @@ export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
             <p className="text-sm text-muted-foreground">Carregando itens...</p>
           )}
         </div>
-      );
+      )
     }
 
-    if (separacao.material_tipo === 'arquivos' || separacao.material_tipo === 'pdf' || separacao.material_tipo === 'imagem') {
+    if (
+      separacao.material_tipo === 'arquivos' ||
+      separacao.material_tipo === 'pdf' ||
+      separacao.material_tipo === 'imagem'
+    ) {
       // Check new arquivos table first
       if (arquivos.length > 0) {
-        const displayFiles = showAllMaterial ? arquivos : arquivos.slice(0, 3);
+        const displayFiles = showAllMaterial ? arquivos : arquivos.slice(0, 3)
         return (
           <div className="space-y-2">
             <div className="flex items-center gap-2 mb-2">
               <Paperclip className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium">{arquivos.length} arquivo{arquivos.length !== 1 ? 's' : ''}</span>
+              <span className="text-sm font-medium">
+                {arquivos.length} arquivo{arquivos.length !== 1 ? 's' : ''}
+              </span>
             </div>
             <div className="space-y-2">
               {displayFiles.map((arquivo) => (
@@ -97,14 +131,18 @@ export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
                     size="sm"
                     onClick={() => {
                       if (arquivo.tipo_arquivo === 'pdf') {
-                        window.open(arquivo.url_arquivo, '_blank');
+                        window.open(arquivo.url_arquivo, '_blank')
                       } else {
-                        setImagePreview(arquivo.url_arquivo);
+                        setImagePreview(arquivo.url_arquivo)
                       }
                     }}
                     className="h-6 w-6 p-0 text-primary"
                   >
-                    {arquivo.tipo_arquivo === 'pdf' ? <Eye className="w-3 h-3" /> : <Expand className="w-3 h-3" />}
+                    {arquivo.tipo_arquivo === 'pdf' ? (
+                      <Eye className="w-3 h-3" />
+                    ) : (
+                      <Expand className="w-3 h-3" />
+                    )}
                   </Button>
                 </div>
               ))}
@@ -117,14 +155,18 @@ export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
                 className="w-full text-primary text-xs h-7"
               >
                 {showAllMaterial ? (
-                  <>Mostrar menos <ChevronUp className="w-3 h-3 ml-1" /></>
+                  <>
+                    Mostrar menos <ChevronUp className="w-3 h-3 ml-1" />
+                  </>
                 ) : (
-                  <>+ {arquivos.length - 3} arquivos <ChevronDown className="w-3 h-3 ml-1" /></>
+                  <>
+                    + {arquivos.length - 3} arquivos <ChevronDown className="w-3 h-3 ml-1" />
+                  </>
                 )}
               </Button>
             )}
           </div>
-        );
+        )
       }
 
       // Fallback to old materialConteudo
@@ -150,10 +192,10 @@ export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
               </a>
             )}
           </div>
-        );
+        )
       }
 
-      return <p className="text-sm text-muted-foreground">Nenhum arquivo</p>;
+      return <p className="text-sm text-muted-foreground">Nenhum arquivo</p>
     }
 
     // texto type or fallback
@@ -162,11 +204,11 @@ export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
         <pre className="text-sm text-secondary-foreground whitespace-pre-wrap font-sans">
           {separacao.material_conteudo}
         </pre>
-      );
+      )
     }
 
-    return <p className="text-sm text-muted-foreground">Sem material</p>;
-  };
+    return <p className="text-sm text-muted-foreground">Sem material</p>
+  }
 
   return (
     <>
@@ -179,14 +221,12 @@ export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
               <p className="text-sm font-bold uppercase text-amber-800 mb-1">
                 Observações Importantes
               </p>
-              <p className="text-sm text-amber-900">
-                {(separacao as any).observacoes_internas}
-              </p>
+              <p className="text-sm text-amber-900">{(separacao as any).observacoes_internas}</p>
             </div>
           </div>
         </div>
       )}
-      
+
       <div className="relative bg-primary-light border-2 border-primary rounded-xl p-5 animate-slide-down">
         {/* Success Check Badge */}
         <div className="absolute -top-3 -right-3 w-8 h-8 bg-success rounded-full flex items-center justify-center shadow-md">
@@ -206,9 +246,7 @@ export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
             <p className="text-xs uppercase font-semibold text-primary-dark/70 tracking-wide mb-1">
               Cliente
             </p>
-            <p className="text-base font-semibold text-foreground">
-              {separacao.cliente}
-            </p>
+            <p className="text-base font-semibold text-foreground">{separacao.cliente}</p>
           </div>
 
           {/* Endereço */}
@@ -246,9 +284,7 @@ export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
                 className="flex items-center gap-2 text-primary hover:text-primary-dark transition-colors"
               >
                 <Phone className="w-4 h-4 flex-shrink-0" />
-                <p className="text-sm font-medium underline">
-                  {separacao.telefone}
-                </p>
+                <p className="text-sm font-medium underline">{separacao.telefone}</p>
               </button>
             </div>
           </div>
@@ -261,9 +297,7 @@ export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
               </p>
               <div className="flex items-center gap-2">
                 <Star className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                <p className="text-sm font-medium text-purple-600">
-                  {separacao.gestora_equipe}
-                </p>
+                <p className="text-sm font-medium text-purple-600">{separacao.gestora_equipe}</p>
               </div>
             </div>
           )}
@@ -293,5 +327,5 @@ export function ObraResumoCard({ separacao }: ObraResumoCardProps) {
         </DialogContent>
       </Dialog>
     </>
-  );
+  )
 }

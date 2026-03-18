@@ -1,14 +1,14 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const Index = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
-    navigate('/separacao', { replace: true });
-  }, [navigate]);
+    navigate('/separacao', { replace: true })
+  }, [navigate])
 
-  return null;
-};
+  return null
+}
 
-export default Index;
+export default Index

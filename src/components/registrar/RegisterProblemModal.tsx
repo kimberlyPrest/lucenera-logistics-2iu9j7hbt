@@ -1,77 +1,100 @@
-import { useState } from 'react';
-import { AlertTriangle, X, Camera, Loader2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useEntregasPendentes } from '@/hooks/useEntregasPendentes';
-import { useAuth } from '@/contexts/AuthContext';
-import { Separacao } from '@/hooks/useSeparacoes';
-import { supabase } from '@/integrations/supabase/client';
-import { cn } from '@/lib/utils';
+import { useState } from 'react'
+import { AlertTriangle, X, Camera, Loader2 } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { useEntregasPendentes } from '@/hooks/useEntregasPendentes'
+import { useAuth } from '@/contexts/AuthContext'
+import { Separacao } from '@/hooks/useSeparacoes'
+import { supabase } from '@/integrations/supabase/client'
+import { cn } from '@/lib/utils'
 
 interface RegisterProblemModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  separacao: Separacao;
-  onSuccess: () => void;
+  isOpen: boolean
+  onClose: () => void
+  separacao: Separacao
+  onSuccess: () => void
 }
 
 const PROBLEM_TYPES = [
-  { id: 'falta_material', label: '🔴 Falta de material/peça', description: 'Algum item está faltando' },
-  { id: 'material_defeito', label: '🔴 Material com defeito', description: 'Produto danificado ou com problema' },
-  { id: 'cliente_ausente', label: '🔴 Cliente ausente', description: 'Ninguém no local para receber' },
+  {
+    id: 'falta_material',
+    label: '🔴 Falta de material/peça',
+    description: 'Algum item está faltando',
+  },
+  {
+    id: 'material_defeito',
+    label: '🔴 Material com defeito',
+    description: 'Produto danificado ou com problema',
+  },
+  {
+    id: 'cliente_ausente',
+    label: '🔴 Cliente ausente',
+    description: 'Ninguém no local para receber',
+  },
   { id: 'endereco_incorreto', label: '🔴 Endereço incorreto', description: 'Local não encontrado' },
-  { id: 'acesso_bloqueado', label: '🔴 Acesso bloqueado', description: 'Obra fechada ou sem acesso' },
-  { id: 'problema_tecnico', label: '🔴 Problema técnico', description: 'Erro na instalação/montagem' },
+  {
+    id: 'acesso_bloqueado',
+    label: '🔴 Acesso bloqueado',
+    description: 'Obra fechada ou sem acesso',
+  },
+  {
+    id: 'problema_tecnico',
+    label: '🔴 Problema técnico',
+    description: 'Erro na instalação/montagem',
+  },
   { id: 'outros', label: '🔴 Outros', description: 'Outro tipo de problema' },
-];
+]
 
-export function RegisterProblemModal({ isOpen, onClose, separacao, onSuccess }: RegisterProblemModalProps) {
-  const [tipoProblema, setTipoProblema] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [fotos, setFotos] = useState<File[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const { createPendencia } = useEntregasPendentes();
-  const { user } = useAuth();
+export function RegisterProblemModal({
+  isOpen,
+  onClose,
+  separacao,
+  onSuccess,
+}: RegisterProblemModalProps) {
+  const [tipoProblema, setTipoProblema] = useState('')
+  const [descricao, setDescricao] = useState('')
+  const [fotos, setFotos] = useState<File[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const { createPendencia } = useEntregasPendentes()
+  const { user } = useAuth()
 
   const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      setFotos(prev => [...prev, ...newFiles].slice(0, 5)); // Max 5 photos
+      const newFiles = Array.from(e.target.files)
+      setFotos((prev) => [...prev, ...newFiles].slice(0, 5)) // Max 5 photos
     }
-  };
+  }
 
   const removeFoto = (index: number) => {
-    setFotos(prev => prev.filter((_, i) => i !== index));
-  };
+    setFotos((prev) => prev.filter((_, i) => i !== index))
+  }
 
   const handleSubmit = async () => {
-    if (!tipoProblema || descricao.trim().length < 20) return;
-    
-    setIsSubmitting(true);
+    if (!tipoProblema || descricao.trim().length < 20) return
+
+    setIsSubmitting(true)
 
     try {
       // Upload photos first
-      const fotosUrls: string[] = [];
-      
+      const fotosUrls: string[] = []
+
       for (let i = 0; i < fotos.length; i++) {
-        const foto = fotos[i];
-        const timestamp = Date.now();
-        const extension = foto.name.split('.').pop() || 'jpg';
-        const filePath = `pendencias/${separacao.codigo_obra}/${timestamp}_${i}.${extension}`;
+        const foto = fotos[i]
+        const timestamp = Date.now()
+        const extension = foto.name.split('.').pop() || 'jpg'
+        const filePath = `pendencias/${separacao.codigo_obra}/${timestamp}_${i}.${extension}`
 
         const { error: uploadError } = await supabase.storage
           .from('entregas-fotos')
-          .upload(filePath, foto);
+          .upload(filePath, foto)
 
         if (!uploadError) {
-          const { data: urlData } = supabase.storage
-            .from('entregas-fotos')
-            .getPublicUrl(filePath);
-          fotosUrls.push(urlData.publicUrl);
+          const { data: urlData } = supabase.storage.from('entregas-fotos').getPublicUrl(filePath)
+          fotosUrls.push(urlData.publicUrl)
         }
       }
 
@@ -88,25 +111,25 @@ export function RegisterProblemModal({ isOpen, onClose, separacao, onSuccess }: 
         fotos_urls: fotosUrls,
         registrado_por: user?.email?.split('@')[0] || 'Desconhecido',
         registrado_por_user_id: user?.id,
-      });
+      })
 
       if (success) {
-        onSuccess();
-        onClose();
-        resetForm();
+        onSuccess()
+        onClose()
+        resetForm()
       }
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const resetForm = () => {
-    setTipoProblema('');
-    setDescricao('');
-    setFotos([]);
-  };
+    setTipoProblema('')
+    setDescricao('')
+    setFotos([])
+  }
 
-  const isValid = tipoProblema && descricao.trim().length >= 20;
+  const isValid = tipoProblema && descricao.trim().length >= 20
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -148,7 +171,7 @@ export function RegisterProblemModal({ isOpen, onClose, separacao, onSuccess }: 
                       'flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all',
                       tipoProblema === type.id
                         ? 'border-red-500 bg-red-50'
-                        : 'border-border hover:border-red-300'
+                        : 'border-border hover:border-red-300',
                     )}
                   >
                     <RadioGroupItem value={type.id} />
@@ -174,13 +197,13 @@ export function RegisterProblemModal({ isOpen, onClose, separacao, onSuccess }: 
               className="min-h-[120px] resize-none"
             />
             <div className="flex justify-between mt-1">
-              <p className="text-xs text-muted-foreground">
-                Mínimo 20 caracteres
-              </p>
-              <p className={cn(
-                'text-xs',
-                descricao.length < 20 ? 'text-red-500' : 'text-muted-foreground'
-              )}>
+              <p className="text-xs text-muted-foreground">Mínimo 20 caracteres</p>
+              <p
+                className={cn(
+                  'text-xs',
+                  descricao.length < 20 ? 'text-red-500' : 'text-muted-foreground',
+                )}
+              >
                 {descricao.length} / 1000
               </p>
             </div>
@@ -188,10 +211,8 @@ export function RegisterProblemModal({ isOpen, onClose, separacao, onSuccess }: 
 
           {/* Photos */}
           <div>
-            <Label className="text-sm font-semibold mb-2 block">
-              Fotos do Problema (Opcional)
-            </Label>
-            
+            <Label className="text-sm font-semibold mb-2 block">Fotos do Problema (Opcional)</Label>
+
             <div className="flex flex-wrap gap-2 mb-2">
               {fotos.map((foto, index) => (
                 <div key={index} className="relative">
@@ -232,11 +253,10 @@ export function RegisterProblemModal({ isOpen, onClose, separacao, onSuccess }: 
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
             <div>
-              <p className="text-sm text-amber-800 font-medium">
-                Atenção
-              </p>
+              <p className="text-sm text-amber-800 font-medium">Atenção</p>
               <p className="text-xs text-amber-700">
-                Ao registrar este problema, a separação será marcada como pendente e aparecerá na lista de pendências.
+                Ao registrar este problema, a separação será marcada como pendente e aparecerá na
+                lista de pendências.
               </p>
             </div>
           </div>
@@ -244,12 +264,7 @@ export function RegisterProblemModal({ isOpen, onClose, separacao, onSuccess }: 
 
         {/* Footer */}
         <div className="flex gap-3 p-6 border-t bg-muted/30">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="flex-1"
-            disabled={isSubmitting}
-          >
+          <Button variant="outline" onClick={onClose} className="flex-1" disabled={isSubmitting}>
             Cancelar
           </Button>
           <Button
@@ -272,5 +287,5 @@ export function RegisterProblemModal({ isOpen, onClose, separacao, onSuccess }: 
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

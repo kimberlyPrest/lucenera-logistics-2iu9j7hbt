@@ -1,96 +1,94 @@
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-  MapPin, 
-  Clock, 
-  Truck, 
-  Calendar, 
-  ArrowLeft, 
-  Navigation2, 
+import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+import {
+  MapPin,
+  Clock,
+  Truck,
+  Calendar,
+  ArrowLeft,
+  Navigation2,
   Timer,
   AlertCircle,
   Route,
   Loader2,
-  ExternalLink
-} from 'lucide-react';
-import { AppLayout } from '@/components/layout/AppLayout';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useSeparacoes, Separacao } from '@/hooks/useSeparacoes';
-import { useOptimizeRoute, OptimizedRouteResult } from '@/hooks/useOptimizeRoute';
-import { format, parseISO } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+  ExternalLink,
+} from 'lucide-react'
+import { AppLayout } from '@/components/layout/AppLayout'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useSeparacoes, Separacao } from '@/hooks/useSeparacoes'
+import { useOptimizeRoute, OptimizedRouteResult } from '@/hooks/useOptimizeRoute'
+import { format, parseISO } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
-const ESTOQUE_LUCENERA = 'R. Dr. Hugo Fortes, 1010 - Ribeirão Preto, SP';
+const ESTOQUE_LUCENERA = 'R. Dr. Hugo Fortes, 1010 - Ribeirão Preto, SP'
 
 export default function RouteOptimizerPage() {
-  const navigate = useNavigate();
-  const { separacoes, isLoading } = useSeparacoes();
-  const { optimizeRoute, isOptimizing } = useOptimizeRoute();
-  const [optimizedResult, setOptimizedResult] = useState<OptimizedRouteResult | null>(null);
+  const navigate = useNavigate()
+  const { separacoes, isLoading } = useSeparacoes()
+  const { optimizeRoute, isOptimizing } = useOptimizeRoute()
+  const [optimizedResult, setOptimizedResult] = useState<OptimizedRouteResult | null>(null)
 
   // Filter today's deliveries
-  const todayStr = format(new Date(), 'yyyy-MM-dd');
-  
+  const todayStr = format(new Date(), 'yyyy-MM-dd')
+
   const todaysDeliveries = useMemo(() => {
-    return separacoes.filter(s => s.data_entrega === todayStr);
-  }, [separacoes, todayStr]);
+    return separacoes.filter((s) => s.data_entrega === todayStr)
+  }, [separacoes, todayStr])
 
   // Sort deliveries: scheduled first (by time), then flexible
   const sortedDeliveries = useMemo(() => {
     if (optimizedResult) {
       // Use optimized order
-      const orderMap = new Map(
-        optimizedResult.rota_otimizada.map(item => [item.id, item.ordem])
-      );
+      const orderMap = new Map(optimizedResult.rota_otimizada.map((item) => [item.id, item.ordem]))
       return [...todaysDeliveries].sort((a, b) => {
-        const orderA = orderMap.get(a.id) ?? 999;
-        const orderB = orderMap.get(b.id) ?? 999;
-        return orderA - orderB;
-      });
+        const orderA = orderMap.get(a.id) ?? 999
+        const orderB = orderMap.get(b.id) ?? 999
+        return orderA - orderB
+      })
     }
 
     // Default sort: scheduled first by time, then flexible
     return [...todaysDeliveries].sort((a, b) => {
-      const aScheduled = a.delivery_type === 'scheduled';
-      const bScheduled = b.delivery_type === 'scheduled';
-      
-      if (aScheduled && !bScheduled) return -1;
-      if (!aScheduled && bScheduled) return 1;
-      
-      if (aScheduled && bScheduled) {
-        return (a.scheduled_time || '').localeCompare(b.scheduled_time || '');
-      }
-      
-      return 0;
-    });
-  }, [todaysDeliveries, optimizedResult]);
+      const aScheduled = a.delivery_type === 'scheduled'
+      const bScheduled = b.delivery_type === 'scheduled'
 
-  const scheduledCount = todaysDeliveries.filter(d => d.delivery_type === 'scheduled').length;
-  const flexibleCount = todaysDeliveries.filter(d => d.delivery_type === 'flexible').length;
+      if (aScheduled && !bScheduled) return -1
+      if (!aScheduled && bScheduled) return 1
+
+      if (aScheduled && bScheduled) {
+        return (a.scheduled_time || '').localeCompare(b.scheduled_time || '')
+      }
+
+      return 0
+    })
+  }, [todaysDeliveries, optimizedResult])
+
+  const scheduledCount = todaysDeliveries.filter((d) => d.delivery_type === 'scheduled').length
+  const flexibleCount = todaysDeliveries.filter((d) => d.delivery_type === 'flexible').length
 
   const handleOptimize = async () => {
-    const result = await optimizeRoute(ESTOQUE_LUCENERA, todaysDeliveries);
+    const result = await optimizeRoute(ESTOQUE_LUCENERA, todaysDeliveries)
     if (result) {
-      setOptimizedResult(result);
+      setOptimizedResult(result)
     }
-  };
+  }
 
   const openInGoogleMaps = () => {
-    const addresses = sortedDeliveries.map(d => encodeURIComponent(d.endereco));
-    const origin = encodeURIComponent(ESTOQUE_LUCENERA);
-    const destination = addresses[addresses.length - 1];
-    const waypoints = addresses.slice(0, -1).join('|');
-    
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${waypoints}&travelmode=driving`;
-    window.open(url, '_blank');
-  };
+    const addresses = sortedDeliveries.map((d) => encodeURIComponent(d.endereco))
+    const origin = encodeURIComponent(ESTOQUE_LUCENERA)
+    const destination = addresses[addresses.length - 1]
+    const waypoints = addresses.slice(0, -1).join('|')
+
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${waypoints}&travelmode=driving`
+    window.open(url, '_blank')
+  }
 
   const getOptimizedInfo = (deliveryId: string) => {
-    if (!optimizedResult) return null;
-    return optimizedResult.rota_otimizada.find(item => item.id === deliveryId);
-  };
+    if (!optimizedResult) return null
+    return optimizedResult.rota_otimizada.find((item) => item.id === deliveryId)
+  }
 
   return (
     <AppLayout>
@@ -100,11 +98,7 @@ export default function RouteOptimizerPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate('/separacao')}
-                >
+                <Button variant="ghost" size="icon" onClick={() => navigate('/separacao')}>
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
                 <div>
@@ -117,14 +111,10 @@ export default function RouteOptimizerPage() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 {sortedDeliveries.length > 0 && (
-                  <Button 
-                    variant="outline"
-                    onClick={openInGoogleMaps}
-                    className="gap-2"
-                  >
+                  <Button variant="outline" onClick={openInGoogleMaps} className="gap-2">
                     <ExternalLink className="w-4 h-4" />
                     Abrir no Maps
                   </Button>
@@ -186,7 +176,8 @@ export default function RouteOptimizerPage() {
                     <div>
                       <span className="text-green-700">Tempo total:</span>
                       <span className="font-bold text-green-900 ml-1">
-                        {Math.floor(optimizedResult.metricas.tempo_total_min / 60)}h {optimizedResult.metricas.tempo_total_min % 60}min
+                        {Math.floor(optimizedResult.metricas.tempo_total_min / 60)}h{' '}
+                        {optimizedResult.metricas.tempo_total_min % 60}min
                       </span>
                     </div>
                     <div className="col-span-2">
@@ -223,10 +214,10 @@ export default function RouteOptimizerPage() {
                 <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                   Entregas Ordenadas
                 </h3>
-                
+
                 {isLoading ? (
                   <div className="space-y-3">
-                    {[1, 2, 3].map(i => (
+                    {[1, 2, 3].map((i) => (
                       <Skeleton key={i} className="h-24 w-full rounded-xl" />
                     ))}
                   </div>
@@ -234,58 +225,55 @@ export default function RouteOptimizerPage() {
                   <div className="text-center py-8 text-muted-foreground">
                     <Truck className="w-12 h-12 mx-auto mb-3 opacity-30" />
                     <p>Nenhuma entrega para hoje</p>
-                    <Button 
-                      variant="link" 
-                      onClick={() => navigate('/separacao')}
-                      className="mt-2"
-                    >
+                    <Button variant="link" onClick={() => navigate('/separacao')} className="mt-2">
                       Ver todas as separações
                     </Button>
                   </div>
                 ) : (
                   sortedDeliveries.map((delivery, index) => {
-                    const optimizedInfo = getOptimizedInfo(delivery.id);
-                    const isScheduled = delivery.delivery_type === 'scheduled';
-                    
+                    const optimizedInfo = getOptimizedInfo(delivery.id)
+                    const isScheduled = delivery.delivery_type === 'scheduled'
+
                     return (
                       <div
                         key={delivery.id}
                         className={`
                           rounded-xl border-2 p-4 transition-all
-                          ${isScheduled 
-                            ? 'bg-orange-50 border-orange-200' 
-                            : 'bg-card border-border'
+                          ${
+                            isScheduled ? 'bg-orange-50 border-orange-200' : 'bg-card border-border'
                           }
                         `}
                       >
                         <div className="flex items-start gap-3">
                           {/* Order Badge */}
-                          <div className={`
+                          <div
+                            className={`
                             w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-lg
-                            ${isScheduled 
-                              ? 'bg-orange-500 text-white' 
-                              : 'bg-blue-500 text-white'
-                            }
-                          `}>
+                            ${isScheduled ? 'bg-orange-500 text-white' : 'bg-blue-500 text-white'}
+                          `}
+                          >
                             {index + 1}
                           </div>
-                          
+
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                               <p className="font-semibold truncate">{delivery.cliente}</p>
                               {isScheduled && (
-                                <Badge variant="outline" className="bg-orange-100 text-orange-700 border-orange-300 shrink-0">
+                                <Badge
+                                  variant="outline"
+                                  className="bg-orange-100 text-orange-700 border-orange-300 shrink-0"
+                                >
                                   <Clock className="w-3 h-3 mr-1" />
                                   {delivery.scheduled_time?.slice(0, 5)} FIXO
                                 </Badge>
                               )}
                             </div>
-                            
+
                             <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                               <MapPin className="w-3 h-3 shrink-0" />
                               <span className="truncate">{delivery.endereco}</span>
                             </p>
-                            
+
                             <p className="text-xs text-muted-foreground mt-1 truncate">
                               {delivery.codigo_obra}
                             </p>
@@ -297,15 +285,13 @@ export default function RouteOptimizerPage() {
                                   <Timer className="w-3 h-3" />
                                   Chegada: {optimizedInfo.horario_chegada}
                                 </span>
-                                <span>
-                                  ~{optimizedInfo.tempo_deslocamento_min} min
-                                </span>
+                                <span>~{optimizedInfo.tempo_deslocamento_min} min</span>
                               </div>
                             )}
                           </div>
                         </div>
                       </div>
-                    );
+                    )
                   })
                 )}
               </div>
@@ -328,9 +314,7 @@ export default function RouteOptimizerPage() {
                     <AlertCircle className="w-4 h-4 text-primary" />
                     Justificativa da Otimização
                   </h4>
-                  <p className="text-sm text-muted-foreground">
-                    {optimizedResult.justificativa}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{optimizedResult.justificativa}</p>
                 </div>
               )}
             </div>
@@ -338,5 +322,5 @@ export default function RouteOptimizerPage() {
         </div>
       </div>
     </AppLayout>
-  );
+  )
 }

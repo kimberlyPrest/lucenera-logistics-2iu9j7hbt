@@ -1,113 +1,126 @@
-import { useState, useMemo } from 'react';
-import { format, addMonths, subMonths } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Plus, Package, List, CalendarDays, Scissors, PackageCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { AppLayout } from '@/components/layout/AppLayout';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CalendarGrid } from '@/components/calendario/CalendarGrid';
-import { DayDetails } from '@/components/calendario/DayDetails';
-import { CalendarLegend } from '@/components/calendario/CalendarLegend';
-import { SeparacaoFormModal } from '@/components/separacao/SeparacaoFormModal';
-import { CreateRouteModal } from '@/components/separacao/CreateRouteModal';
-import { useCalendarData, MonthData, DayData } from '@/hooks/useCalendarData';
-import { Separacao } from '@/hooks/useSeparacoes';
-import { StatusSeparacao } from '@/types/separacao';
+import { useState, useMemo } from 'react'
+import { format, addMonths, subMonths } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Package,
+  List,
+  CalendarDays,
+  Scissors,
+  PackageCheck,
+} from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { AppLayout } from '@/components/layout/AppLayout'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { CalendarGrid } from '@/components/calendario/CalendarGrid'
+import { DayDetails } from '@/components/calendario/DayDetails'
+import { CalendarLegend } from '@/components/calendario/CalendarLegend'
+import { SeparacaoFormModal } from '@/components/separacao/SeparacaoFormModal'
+import { CreateRouteModal } from '@/components/separacao/CreateRouteModal'
+import { useCalendarData, MonthData, DayData } from '@/hooks/useCalendarData'
+import { Separacao } from '@/hooks/useSeparacoes'
+import { StatusSeparacao } from '@/types/separacao'
 
 export default function CalendarioPage() {
-  const navigate = useNavigate();
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [statusFilter, setStatusFilter] = useState<'todos' | StatusSeparacao>('todos');
-  
-  // Modal states
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-  const [editingSeparacao, setEditingSeparacao] = useState<Separacao | null>(null);
-  const [routeModalData, setRouteModalData] = useState<{
-    isOpen: boolean;
-    date: Date;
-    deliveries: Separacao[];
-  } | null>(null);
+  const navigate = useNavigate()
+  const [currentMonth, setCurrentMonth] = useState(new Date())
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [statusFilter, setStatusFilter] = useState<'todos' | StatusSeparacao>('todos')
 
-  const year = currentMonth.getFullYear();
-  const month = currentMonth.getMonth();
-  
-  const { data: monthData, isLoading, totalEntregas, refetch } = useCalendarData(year, month);
+  // Modal states
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false)
+  const [editingSeparacao, setEditingSeparacao] = useState<Separacao | null>(null)
+  const [routeModalData, setRouteModalData] = useState<{
+    isOpen: boolean
+    date: Date
+    deliveries: Separacao[]
+  } | null>(null)
+
+  const year = currentMonth.getFullYear()
+  const month = currentMonth.getMonth()
+
+  const { data: monthData, isLoading, totalEntregas, refetch } = useCalendarData(year, month)
 
   // Filter monthData by status
   const filteredMonthData = useMemo(() => {
-    if (statusFilter === 'todos') return monthData;
-    
-    const filtered: MonthData = {};
+    if (statusFilter === 'todos') return monthData
+
+    const filtered: MonthData = {}
     Object.entries(monthData).forEach(([dateKey, dayData]) => {
-      const filteredEntregas = dayData.entregas.filter(e => e.status === statusFilter);
+      const filteredEntregas = dayData.entregas.filter((e) => e.status === statusFilter)
       if (filteredEntregas.length > 0) {
         filtered[dateKey] = {
           total: filteredEntregas.length,
-          materialSolicitado: filteredEntregas.filter(e => e.status === 'material_solicitado').length,
-          emSeparacao: filteredEntregas.filter(e => e.status === 'em_separacao').length,
-          separado: filteredEntregas.filter(e => e.status === 'separado').length,
-          garantia: filteredEntregas.filter(e => e.status === 'matheus_separacao_garantia').length,
-          pendente: filteredEntregas.filter(e => e.status === 'pendente').length,
-          finalizado: filteredEntregas.filter(e => e.status === 'finalizado').length,
-          separando: filteredEntregas.filter(e => e.status === 'material_solicitado' || e.status === 'em_separacao').length,
+          materialSolicitado: filteredEntregas.filter((e) => e.status === 'material_solicitado')
+            .length,
+          emSeparacao: filteredEntregas.filter((e) => e.status === 'em_separacao').length,
+          separado: filteredEntregas.filter((e) => e.status === 'separado').length,
+          garantia: filteredEntregas.filter((e) => e.status === 'matheus_separacao_garantia')
+            .length,
+          pendente: filteredEntregas.filter((e) => e.status === 'pendente').length,
+          finalizado: filteredEntregas.filter((e) => e.status === 'finalizado').length,
+          separando: filteredEntregas.filter(
+            (e) => e.status === 'material_solicitado' || e.status === 'em_separacao',
+          ).length,
           entregas: filteredEntregas,
-        };
+        }
       }
-    });
-    return filtered;
-  }, [monthData, statusFilter]);
+    })
+    return filtered
+  }, [monthData, statusFilter])
 
   const filteredTotalEntregas = useMemo(() => {
-    return Object.values(filteredMonthData).reduce((sum, day) => sum + day.total, 0);
-  }, [filteredMonthData]);
+    return Object.values(filteredMonthData).reduce((sum, day) => sum + day.total, 0)
+  }, [filteredMonthData])
 
   const selectedDayData = useMemo(() => {
-    if (!selectedDate) return null;
-    const dateKey = format(selectedDate, 'yyyy-MM-dd');
-    return filteredMonthData[dateKey] || null;
-  }, [selectedDate, filteredMonthData]);
+    if (!selectedDate) return null
+    const dateKey = format(selectedDate, 'yyyy-MM-dd')
+    return filteredMonthData[dateKey] || null
+  }, [selectedDate, filteredMonthData])
 
   const handlePrevMonth = () => {
-    setCurrentMonth(prev => subMonths(prev, 1));
-    setSelectedDate(null);
-  };
+    setCurrentMonth((prev) => subMonths(prev, 1))
+    setSelectedDate(null)
+  }
 
   const handleNextMonth = () => {
-    setCurrentMonth(prev => addMonths(prev, 1));
-    setSelectedDate(null);
-  };
+    setCurrentMonth((prev) => addMonths(prev, 1))
+    setSelectedDate(null)
+  }
 
   const handleToday = () => {
-    const today = new Date();
-    setCurrentMonth(today);
-    setSelectedDate(today);
-  };
+    const today = new Date()
+    setCurrentMonth(today)
+    setSelectedDate(today)
+  }
 
   const handleSelectDate = (date: Date) => {
-    setSelectedDate(date);
-  };
+    setSelectedDate(date)
+  }
 
   const handleOpenCreate = () => {
-    setEditingSeparacao(null);
-    setIsFormModalOpen(true);
-  };
+    setEditingSeparacao(null)
+    setIsFormModalOpen(true)
+  }
 
   const handleEditSeparacao = (separacao: Separacao) => {
-    setEditingSeparacao(separacao);
-    setIsFormModalOpen(true);
-  };
+    setEditingSeparacao(separacao)
+    setIsFormModalOpen(true)
+  }
 
   const handleCloseModal = () => {
-    setIsFormModalOpen(false);
-    setEditingSeparacao(null);
-  };
+    setIsFormModalOpen(false)
+    setEditingSeparacao(null)
+  }
 
   const handleFormSuccess = () => {
-    refetch();
-    setEditingSeparacao(null);
-  };
+    refetch()
+    setEditingSeparacao(null)
+  }
 
   const handleCreateRoute = () => {
     if (selectedDate && selectedDayData) {
@@ -115,9 +128,9 @@ export default function CalendarioPage() {
         isOpen: true,
         date: selectedDate,
         deliveries: selectedDayData.entregas,
-      });
+      })
     }
-  };
+  }
 
   return (
     <AppLayout>
@@ -133,11 +146,7 @@ export default function CalendarioPage() {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => navigate('/separacao')}
-                  className="gap-2"
-                >
+                <Button variant="outline" onClick={() => navigate('/separacao')} className="gap-2">
                   <List className="w-4 h-4" />
                   <span className="hidden sm:inline">Ver em Lista</span>
                 </Button>
@@ -151,7 +160,11 @@ export default function CalendarioPage() {
                 </Button>
               </div>
             </div>
-            <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as typeof statusFilter)} className="w-full sm:w-auto">
+            <Tabs
+              value={statusFilter}
+              onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}
+              className="w-full sm:w-auto"
+            >
               <TabsList className="h-9">
                 <TabsTrigger value="todos" className="text-xs px-3 gap-1.5">
                   Todos
@@ -185,17 +198,18 @@ export default function CalendarioPage() {
                 <Button variant="ghost" size="icon" onClick={handlePrevMonth}>
                   <ChevronLeft className="w-5 h-5" />
                 </Button>
-                
+
                 <div className="text-center">
                   <h2 className="text-xl font-semibold text-foreground capitalize">
                     {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
                   </h2>
                   <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mt-1">
                     <Package className="w-4 h-4" />
-                    {filteredTotalEntregas} {filteredTotalEntregas === 1 ? 'entrega' : 'entregas'} neste mês
+                    {filteredTotalEntregas} {filteredTotalEntregas === 1 ? 'entrega' : 'entregas'}{' '}
+                    neste mês
                   </p>
                 </div>
-                
+
                 <Button variant="ghost" size="icon" onClick={handleNextMonth}>
                   <ChevronRight className="w-5 h-5" />
                 </Button>
@@ -254,5 +268,5 @@ export default function CalendarioPage() {
         />
       )}
     </AppLayout>
-  );
+  )
 }

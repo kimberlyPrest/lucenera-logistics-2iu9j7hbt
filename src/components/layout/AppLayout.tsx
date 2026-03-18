@@ -1,18 +1,30 @@
-import { ReactNode, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Package, CheckCircle2, Truck, LogOut, User, Route, CalendarDays, Shield, AlertTriangle, KeyRound, ChevronDown } from 'lucide-react';
-import luceneraHorizontal from '@/assets/logos/lucenera-horizontal.png';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserRole } from '@/hooks/useUserRole';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Separator } from '@/components/ui/separator';
-import { ChangePasswordModal } from '@/components/auth/ChangePasswordModal';
+import { ReactNode, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import {
+  Package,
+  CheckCircle2,
+  Truck,
+  LogOut,
+  User,
+  Route,
+  CalendarDays,
+  Shield,
+  AlertTriangle,
+  KeyRound,
+  ChevronDown,
+} from 'lucide-react'
+import luceneraHorizontal from '@/assets/logos/lucenera-horizontal.png'
+import { cn } from '@/lib/utils'
+import { useAuth } from '@/contexts/AuthContext'
+import { useUserRole } from '@/hooks/useUserRole'
+import { Button } from '@/components/ui/button'
+import { useToast } from '@/hooks/use-toast'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Separator } from '@/components/ui/separator'
+import { ChangePasswordModal } from '@/components/auth/ChangePasswordModal'
 
 interface AppLayoutProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 const allNavItems = [
@@ -50,24 +62,24 @@ const allNavItems = [
     href: '/otimizar-rota',
     icon: Route,
   },
-];
+]
 
 export function AppLayout({ children }: AppLayoutProps) {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-  const { isAdmin, isEntregador, userRole, userName } = useUserRole();
-  const { toast } = useToast();
-  const [showChangePassword, setShowChangePassword] = useState(false);
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { user, signOut } = useAuth()
+  const { isAdmin, isEntregador, userRole, userName } = useUserRole()
+  const { toast } = useToast()
+  const [showChangePassword, setShowChangePassword] = useState(false)
 
   const handleLogout = async () => {
-    await signOut();
+    await signOut()
     toast({
       title: 'Até logo!',
       description: 'Você foi desconectado com sucesso.',
-    });
-    navigate('/login');
-  };
+    })
+    navigate('/login')
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -77,9 +89,9 @@ export function AppLayout({ children }: AppLayoutProps) {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img 
-                src={luceneraHorizontal} 
-                alt="Lucenera" 
+              <img
+                src={luceneraHorizontal}
+                alt="Lucenera"
                 className="h-7 sm:h-9 w-auto hover:opacity-80 transition-opacity"
               />
             </Link>
@@ -87,30 +99,30 @@ export function AppLayout({ children }: AppLayoutProps) {
             {/* Navigation */}
             <nav className="flex items-center gap-1">
               {allNavItems
-                .filter(item => !(isEntregador && item.hideForEntregador))
+                .filter((item) => !(isEntregador && item.hideForEntregador))
                 .map((item) => {
-                const isActive = location.pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    className={cn(
-                      'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
-                      isActive
-                        ? item.highlight 
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-primary-light text-primary-dark'
-                        : item.highlight
-                          ? 'text-red-600 hover:bg-red-50 hover:text-red-700'
-                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                    )}
-                  >
-                    <item.icon className={cn('w-4 h-4', item.highlight && 'text-red-500')} />
-                    <span className="hidden sm:inline">{item.label}</span>
-                  </Link>
-                );
-              })}
-              
+                  const isActive = location.pathname === item.href
+                  return (
+                    <Link
+                      key={item.href}
+                      to={item.href}
+                      className={cn(
+                        'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
+                        isActive
+                          ? item.highlight
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-primary-light text-primary-dark'
+                          : item.highlight
+                            ? 'text-red-600 hover:bg-red-50 hover:text-red-700'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                      )}
+                    >
+                      <item.icon className={cn('w-4 h-4', item.highlight && 'text-red-500')} />
+                      <span className="hidden sm:inline">{item.label}</span>
+                    </Link>
+                  )
+                })}
+
               {/* Admin Link - only for admins */}
               {isAdmin && (
                 <Link
@@ -119,7 +131,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                     'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
                     location.pathname.startsWith('/admin')
                       ? 'bg-purple-100 text-purple-700'
-                      : 'text-purple-600 hover:bg-purple-50 hover:text-purple-700'
+                      : 'text-purple-600 hover:bg-purple-50 hover:text-purple-700',
                   )}
                 >
                   <Shield className="w-4 h-4" />
@@ -147,7 +159,11 @@ export function AppLayout({ children }: AppLayoutProps) {
                     <p className="text-sm font-semibold text-foreground truncate">{userName}</p>
                     <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                     <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide bg-muted text-muted-foreground">
-                      {userRole?.role === 'admin' ? '🛡️ Administrador' : userRole?.role === 'entregador' ? '🚚 Entregador' : '👤 Usuário'}
+                      {userRole?.role === 'admin'
+                        ? '🛡️ Administrador'
+                        : userRole?.role === 'entregador'
+                          ? '🚚 Entregador'
+                          : '👤 Usuário'}
                     </span>
                   </div>
                   <Separator />
@@ -175,11 +191,9 @@ export function AppLayout({ children }: AppLayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
 
       <ChangePasswordModal open={showChangePassword} onClose={() => setShowChangePassword(false)} />
     </div>
-  );
+  )
 }

@@ -1,19 +1,19 @@
-import { ReactNode } from 'react';
-import { MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ReactNode } from 'react'
+import { MapPin } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 interface DateSectionProps {
-  date: Date;
-  count: number;
-  children: ReactNode;
-  onCreateRoute?: () => void;
+  date: Date
+  count: number
+  children: ReactNode
+  onCreateRoute?: () => void
 }
 
 export function DateSection({ date, count, children, onCreateRoute }: DateSectionProps) {
-  const formattedDate = format(date, "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR });
-  const capitalizedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+  const formattedDate = format(date, "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR })
+  const capitalizedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)
 
   return (
     <section className="mb-10">
@@ -35,9 +35,7 @@ export function DateSection({ date, count, children, onCreateRoute }: DateSectio
       </div>
 
       {/* Cards */}
-      <div className="space-y-4">
-        {children}
-      </div>
+      <div className="space-y-4">{children}</div>
     </section>
-  );
+  )
 }

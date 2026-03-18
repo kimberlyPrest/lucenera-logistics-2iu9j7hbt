@@ -1,40 +1,44 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query'
+import { supabase } from '@/integrations/supabase/client'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface UserRole {
-  id: string;
-  user_id: string;
-  email: string;
-  role: 'admin' | 'user' | 'entregador';
-  nome_completo: string | null;
-  created_at: string | null;
-  updated_at: string | null;
+  id: string
+  user_id: string
+  email: string
+  role: 'admin' | 'user' | 'entregador'
+  nome_completo: string | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 export function useUserRole() {
-  const { user } = useAuth();
+  const { user } = useAuth()
 
-  const { data: userRole, isLoading, error } = useQuery({
+  const {
+    data: userRole,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['user-role', user?.id],
     queryFn: async () => {
-      if (!user?.id) return null;
-      
+      if (!user?.id) return null
+
       const { data, error } = await supabase
         .from('user_roles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
-      
+        .single()
+
       if (error) {
-        console.error('Error fetching user role:', error);
-        return null;
+        console.error('Error fetching user role:', error)
+        return null
       }
-      
-      return data as UserRole;
+
+      return data as UserRole
     },
     enabled: !!user?.id,
-  });
+  })
 
   return {
     userRole,
@@ -44,5 +48,5 @@ export function useUserRole() {
     isLoading,
     error,
     userName: userRole?.nome_completo || user?.email?.split('@')[0] || 'Usuário',
-  };
+  }
 }

@@ -1,16 +1,16 @@
-import { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserRole } from '@/hooks/useUserRole';
-import { Loader2, ShieldX } from 'lucide-react';
+import { ReactNode } from 'react'
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
+import { useUserRole } from '@/hooks/useUserRole'
+import { Loader2, ShieldX } from 'lucide-react'
 
 interface AdminRouteProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 export function AdminRoute({ children }: AdminRouteProps) {
-  const { user, isLoading: authLoading } = useAuth();
-  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { user, isLoading: authLoading } = useAuth()
+  const { isAdmin, isLoading: roleLoading } = useUserRole()
 
   if (authLoading || roleLoading) {
     return (
@@ -20,11 +20,11 @@ export function AdminRoute({ children }: AdminRouteProps) {
           <p className="text-muted-foreground">Verificando permissões...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace />
   }
 
   if (!isAdmin) {
@@ -36,19 +36,16 @@ export function AdminRoute({ children }: AdminRouteProps) {
           </div>
           <h1 className="text-2xl font-bold text-foreground">Acesso Negado</h1>
           <p className="text-muted-foreground max-w-md">
-            Você não tem permissão para acessar o painel administrativo.
-            Entre em contato com um administrador se acredita que isso é um erro.
+            Você não tem permissão para acessar o painel administrativo. Entre em contato com um
+            administrador se acredita que isso é um erro.
           </p>
-          <a 
-            href="/separacao" 
-            className="mt-4 text-primary hover:underline"
-          >
+          <a href="/separacao" className="mt-4 text-primary hover:underline">
             ← Voltar ao sistema
           </a>
         </div>
       </div>
-    );
+    )
   }
 
-  return <>{children}</>;
+  return <>{children}</>
 }

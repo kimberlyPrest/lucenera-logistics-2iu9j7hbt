@@ -1,40 +1,40 @@
-import { useState } from 'react';
-import { X, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { useSignedUrls } from '@/hooks/useSignedUrls';
+import { useState } from 'react'
+import { X, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { useSignedUrls } from '@/hooks/useSignedUrls'
 
 interface PhotoGalleryProps {
-  photos: string[];
-  maxVisible?: number;
+  photos: string[]
+  maxVisible?: number
 }
 
 export function PhotoGallery({ photos, maxVisible = 8 }: PhotoGalleryProps) {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+
   // Generate signed URLs for all photos
-  const { signedUrls, isLoading } = useSignedUrls(photos, 'entregas-fotos');
-  
-  const displayPhotos = signedUrls.length > 0 ? signedUrls : photos;
-  const visiblePhotos = displayPhotos.slice(0, maxVisible);
-  const remainingCount = displayPhotos.length - maxVisible;
+  const { signedUrls, isLoading } = useSignedUrls(photos, 'entregas-fotos')
+
+  const displayPhotos = signedUrls.length > 0 ? signedUrls : photos
+  const visiblePhotos = displayPhotos.slice(0, maxVisible)
+  const remainingCount = displayPhotos.length - maxVisible
 
   const handlePrevious = () => {
     if (selectedIndex !== null) {
-      setSelectedIndex(selectedIndex === 0 ? displayPhotos.length - 1 : selectedIndex - 1);
+      setSelectedIndex(selectedIndex === 0 ? displayPhotos.length - 1 : selectedIndex - 1)
     }
-  };
+  }
 
   const handleNext = () => {
     if (selectedIndex !== null) {
-      setSelectedIndex(selectedIndex === displayPhotos.length - 1 ? 0 : selectedIndex + 1);
+      setSelectedIndex(selectedIndex === displayPhotos.length - 1 ? 0 : selectedIndex + 1)
     }
-  };
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowLeft') handlePrevious();
-    if (e.key === 'ArrowRight') handleNext();
-    if (e.key === 'Escape') setSelectedIndex(null);
-  };
+    if (e.key === 'ArrowLeft') handlePrevious()
+    if (e.key === 'ArrowRight') handleNext()
+    if (e.key === 'Escape') setSelectedIndex(null)
+  }
 
   if (isLoading) {
     return (
@@ -42,11 +42,11 @@ export function PhotoGallery({ photos, maxVisible = 8 }: PhotoGalleryProps) {
         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         <span className="ml-2 text-muted-foreground">Carregando fotos...</span>
       </div>
-    );
+    )
   }
 
   if (displayPhotos.length === 0) {
-    return null;
+    return null
   }
 
   return (
@@ -64,14 +64,14 @@ export function PhotoGallery({ photos, maxVisible = 8 }: PhotoGalleryProps) {
               className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
               onError={(e) => {
                 // Fallback if signed URL fails
-                const target = e.target as HTMLImageElement;
-                target.src = '/placeholder.svg';
+                const target = e.target as HTMLImageElement
+                target.src = '/placeholder.svg'
               }}
             />
             <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors" />
           </button>
         ))}
-        
+
         {remainingCount > 0 && (
           <button
             onClick={() => setSelectedIndex(maxVisible)}
@@ -86,7 +86,7 @@ export function PhotoGallery({ photos, maxVisible = 8 }: PhotoGalleryProps) {
 
       {/* Fullscreen Modal */}
       <Dialog open={selectedIndex !== null} onOpenChange={() => setSelectedIndex(null)}>
-        <DialogContent 
+        <DialogContent
           className="max-w-[95vw] max-h-[95vh] p-0 bg-foreground/95 border-none"
           onKeyDown={handleKeyDown}
         >
@@ -129,8 +129,8 @@ export function PhotoGallery({ photos, maxVisible = 8 }: PhotoGalleryProps) {
                 alt={`Foto ${selectedIndex + 1}`}
                 className="max-w-[90vw] max-h-[85vh] object-contain animate-scale-in"
                 onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/placeholder.svg';
+                  const target = e.target as HTMLImageElement
+                  target.src = '/placeholder.svg'
                 }}
               />
             )}
@@ -138,5 +138,5 @@ export function PhotoGallery({ photos, maxVisible = 8 }: PhotoGalleryProps) {
         </DialogContent>
       </Dialog>
     </>
-  );
+  )
 }

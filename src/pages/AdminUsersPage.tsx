@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { AdminLayout } from '@/components/admin/AdminLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { supabase } from '@/integrations/supabase/client'
+import { AdminLayout } from '@/components/admin/AdminLayout'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui/dialog'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,7 +23,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@/components/ui/alert-dialog'
 import {
   Table,
   TableBody,
@@ -31,19 +31,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/table'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Users, 
-  Crown, 
-  UserCheck, 
+} from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import {
+  Users,
+  Crown,
+  UserCheck,
   Search,
   Plus,
   Eye,
@@ -53,41 +53,41 @@ import {
   RefreshCw,
   CheckCircle2,
   Key,
-  Truck
-} from 'lucide-react';
-import { format } from 'date-fns';
-import { toast } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
-import { ResetPasswordModal } from '@/components/admin/ResetPasswordModal';
+  Truck,
+} from 'lucide-react'
+import { format } from 'date-fns'
+import { toast } from 'sonner'
+import { useAuth } from '@/contexts/AuthContext'
+import { ResetPasswordModal } from '@/components/admin/ResetPasswordModal'
 
 interface UserRole {
-  id: string;
-  user_id: string;
-  email: string;
-  role: 'admin' | 'user' | 'entregador';
-  nome_completo: string | null;
-  created_at: string | null;
+  id: string
+  user_id: string
+  email: string
+  role: 'admin' | 'user' | 'entregador'
+  nome_completo: string | null
+  created_at: string | null
 }
 
 export default function AdminUsersPage() {
-  const { user: currentUser } = useAuth();
-  const queryClient = useQueryClient();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<UserRole | null>(null);
-  
+  const { user: currentUser } = useAuth()
+  const queryClient = useQueryClient()
+  const [searchTerm, setSearchTerm] = useState('')
+  const [roleFilter, setRoleFilter] = useState<string>('all')
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<UserRole | null>(null)
+
   // Form state
   const [formData, setFormData] = useState({
     nome_completo: '',
     email: '',
     password: '',
     role: 'user' as 'admin' | 'user' | 'entregador',
-  });
+  })
 
   // Fetch users
   const { data: users, isLoading } = useQuery({
@@ -96,27 +96,27 @@ export default function AdminUsersPage() {
       const { data, error } = await supabase
         .from('user_roles')
         .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data as UserRole[];
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return data as UserRole[]
     },
-  });
+  })
 
   // Create user mutation (uses edge function to avoid session swap)
   const createUserMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-      
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData?.session?.access_token
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
           body: JSON.stringify({
             email: data.email,
@@ -124,66 +124,60 @@ export default function AdminUsersPage() {
             nome_completo: data.nome_completo,
             role: data.role,
           }),
-        }
-      );
-      
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Erro ao criar usuário');
-      
-      return result.user;
+        },
+      )
+
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Erro ao criar usuário')
+
+      return result.user
     },
     onSuccess: () => {
-      toast.success('Usuário criado com sucesso!');
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      setIsCreateModalOpen(false);
-      resetForm();
+      toast.success('Usuário criado com sucesso!')
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+      setIsCreateModalOpen(false)
+      resetForm()
     },
     onError: (error: Error) => {
-      toast.error(`Erro ao criar usuário: ${error.message}`);
+      toast.error(`Erro ao criar usuário: ${error.message}`)
     },
-  });
+  })
 
   // Update user mutation
   const updateUserMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<UserRole> }) => {
-      const { error } = await supabase
-        .from('user_roles')
-        .update(data)
-        .eq('id', id);
-      
-      if (error) throw error;
+      const { error } = await supabase.from('user_roles').update(data).eq('id', id)
+
+      if (error) throw error
     },
     onSuccess: () => {
-      toast.success('Usuário atualizado com sucesso!');
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      setIsEditModalOpen(false);
-      setSelectedUser(null);
+      toast.success('Usuário atualizado com sucesso!')
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+      setIsEditModalOpen(false)
+      setSelectedUser(null)
     },
     onError: (error: Error) => {
-      toast.error(`Erro ao atualizar: ${error.message}`);
+      toast.error(`Erro ao atualizar: ${error.message}`)
     },
-  });
+  })
 
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const { error } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('id', userId);
-      
-      if (error) throw error;
+      const { error } = await supabase.from('user_roles').delete().eq('id', userId)
+
+      if (error) throw error
     },
     onSuccess: () => {
-      toast.success('Usuário removido com sucesso!');
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      setIsDeleteDialogOpen(false);
-      setSelectedUser(null);
+      toast.success('Usuário removido com sucesso!')
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+      setIsDeleteDialogOpen(false)
+      setSelectedUser(null)
     },
     onError: (error: Error) => {
-      toast.error(`Erro ao remover: ${error.message}`);
+      toast.error(`Erro ao remover: ${error.message}`)
     },
-  });
+  })
 
   const resetForm = () => {
     setFormData({
@@ -191,43 +185,41 @@ export default function AdminUsersPage() {
       email: '',
       password: '',
       role: 'user',
-    });
-  };
+    })
+  }
 
   const generatePassword = () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
-    let password = '';
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%'
+    let password = ''
     for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
+      password += chars.charAt(Math.floor(Math.random() * chars.length))
     }
-    setFormData(prev => ({ ...prev, password }));
-  };
+    setFormData((prev) => ({ ...prev, password }))
+  }
 
-  const filteredUsers = users?.filter(user => {
-    const matchesSearch = 
+  const filteredUsers = users?.filter((user) => {
+    const matchesSearch =
       user.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    return matchesSearch && matchesRole;
-  });
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesRole = roleFilter === 'all' || user.role === roleFilter
+    return matchesSearch && matchesRole
+  })
 
-  const adminCount = users?.filter(u => u.role === 'admin').length || 0;
-  const userCount = users?.filter(u => u.role === 'user').length || 0;
-  const entregadorCount = users?.filter(u => u.role === 'entregador').length || 0;
+  const adminCount = users?.filter((u) => u.role === 'admin').length || 0
+  const userCount = users?.filter((u) => u.role === 'user').length || 0
+  const entregadorCount = users?.filter((u) => u.role === 'entregador').length || 0
 
   return (
     <AdminLayout>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-purple-700">
-            Gerenciamento de Usuários
-          </h1>
+          <h1 className="text-2xl font-bold text-purple-700">Gerenciamento de Usuários</h1>
           <p className="text-sm text-muted-foreground">
             Adicionar, editar e remover acessos ao sistema
           </p>
         </div>
-        <Button 
+        <Button
           onClick={() => setIsCreateModalOpen(true)}
           className="bg-purple-600 hover:bg-purple-700"
         >
@@ -338,9 +330,15 @@ export default function AdminUsersPage() {
                     <TableRow key={user.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${
-                            user.role === 'admin' ? 'bg-purple-600' : user.role === 'entregador' ? 'bg-orange-500' : 'bg-blue-500'
-                          }`}>
+                          <div
+                            className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${
+                              user.role === 'admin'
+                                ? 'bg-purple-600'
+                                : user.role === 'entregador'
+                                  ? 'bg-orange-500'
+                                  : 'bg-blue-500'
+                            }`}
+                          >
                             {(user.nome_completo || user.email)[0].toUpperCase()}
                           </div>
                           <span className="font-medium">
@@ -348,9 +346,7 @@ export default function AdminUsersPage() {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {user.email}
-                      </TableCell>
+                      <TableCell className="text-muted-foreground">{user.email}</TableCell>
                       <TableCell>
                         {user.role === 'admin' ? (
                           <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100">
@@ -367,9 +363,7 @@ export default function AdminUsersPage() {
                         )}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {user.created_at 
-                          ? format(new Date(user.created_at), 'dd/MM/yyyy')
-                          : '-'}
+                        {user.created_at ? format(new Date(user.created_at), 'dd/MM/yyyy') : '-'}
                       </TableCell>
                       <TableCell>
                         <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
@@ -382,8 +376,8 @@ export default function AdminUsersPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => {
-                              setSelectedUser(user);
-                              setIsViewModalOpen(true);
+                              setSelectedUser(user)
+                              setIsViewModalOpen(true)
                             }}
                             title="Ver Perfil"
                           >
@@ -393,14 +387,14 @@ export default function AdminUsersPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => {
-                              setSelectedUser(user);
+                              setSelectedUser(user)
                               setFormData({
                                 nome_completo: user.nome_completo || '',
                                 email: user.email,
                                 password: '',
                                 role: user.role,
-                              });
-                              setIsEditModalOpen(true);
+                              })
+                              setIsEditModalOpen(true)
                             }}
                             title="Editar"
                           >
@@ -410,8 +404,8 @@ export default function AdminUsersPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => {
-                              setSelectedUser(user);
-                              setIsResetPasswordModalOpen(true);
+                              setSelectedUser(user)
+                              setIsResetPasswordModalOpen(true)
                             }}
                             title="Redefinir Senha"
                           >
@@ -422,16 +416,20 @@ export default function AdminUsersPage() {
                             size="icon"
                             disabled={user.user_id === currentUser?.id}
                             onClick={() => {
-                              setSelectedUser(user);
-                              setIsDeleteDialogOpen(true);
+                              setSelectedUser(user)
+                              setIsDeleteDialogOpen(true)
                             }}
-                            title={user.user_id === currentUser?.id ? "Você não pode excluir sua própria conta" : "Excluir"}
+                            title={
+                              user.user_id === currentUser?.id
+                                ? 'Você não pode excluir sua própria conta'
+                                : 'Excluir'
+                            }
                           >
-                            <Trash2 className={`w-4 h-4 ${
-                              user.user_id === currentUser?.id 
-                                ? 'text-gray-300' 
-                                : 'text-red-600'
-                            }`} />
+                            <Trash2
+                              className={`w-4 h-4 ${
+                                user.user_id === currentUser?.id ? 'text-gray-300' : 'text-red-600'
+                              }`}
+                            />
                           </Button>
                         </div>
                       </TableCell>
@@ -459,11 +457,9 @@ export default function AdminUsersPage() {
               <Plus className="w-5 h-5 text-purple-600" />
               Adicionar Novo Usuário
             </DialogTitle>
-            <DialogDescription>
-              Criar novo acesso ao sistema
-            </DialogDescription>
+            <DialogDescription>Criar novo acesso ao sistema</DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="nome">Nome Completo *</Label>
@@ -471,10 +467,12 @@ export default function AdminUsersPage() {
                 id="nome"
                 placeholder="Ex: Maria Silva Santos"
                 value={formData.nome_completo}
-                onChange={(e) => setFormData(prev => ({ ...prev, nome_completo: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, nome_completo: e.target.value }))
+                }
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="email">Email *</Label>
               <Input
@@ -482,10 +480,10 @@ export default function AdminUsersPage() {
                 type="email"
                 placeholder="usuario@lucenera.com.br"
                 value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Senha Temporária *</Label>
               <div className="flex gap-2">
@@ -494,20 +492,20 @@ export default function AdminUsersPage() {
                   type="text"
                   placeholder="Mínimo 8 caracteres"
                   value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
                 />
                 <Button type="button" variant="outline" onClick={generatePassword}>
                   <RefreshCw className="w-4 h-4" />
                 </Button>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label>Nível de Acesso *</Label>
               <div className="grid grid-cols-3 gap-3">
                 <button
                   type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, role: 'user' }))}
+                  onClick={() => setFormData((prev) => ({ ...prev, role: 'user' }))}
                   className={`p-4 rounded-lg border-2 text-left transition-all ${
                     formData.role === 'user'
                       ? 'border-blue-500 bg-blue-50'
@@ -516,13 +514,11 @@ export default function AdminUsersPage() {
                 >
                   <UserCheck className="w-6 h-6 text-blue-500 mb-2" />
                   <p className="font-semibold text-sm">Usuário</p>
-                  <p className="text-xs text-muted-foreground">
-                    Acesso interno completo
-                  </p>
+                  <p className="text-xs text-muted-foreground">Acesso interno completo</p>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, role: 'entregador' }))}
+                  onClick={() => setFormData((prev) => ({ ...prev, role: 'entregador' }))}
                   className={`p-4 rounded-lg border-2 text-left transition-all ${
                     formData.role === 'entregador'
                       ? 'border-orange-500 bg-orange-50'
@@ -531,39 +527,39 @@ export default function AdminUsersPage() {
                 >
                   <Truck className="w-6 h-6 text-orange-500 mb-2" />
                   <p className="font-semibold text-sm">Entregador</p>
-                  <p className="text-xs text-muted-foreground">
-                    Rota + entregas apenas
-                  </p>
+                  <p className="text-xs text-muted-foreground">Rota + entregas apenas</p>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, role: 'admin' }))}
+                  onClick={() => setFormData((prev) => ({ ...prev, role: 'admin' }))}
                   className={`p-4 rounded-lg border-2 text-left transition-all relative ${
                     formData.role === 'admin'
                       ? 'border-purple-500 bg-purple-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <Badge className="absolute top-2 right-2 bg-red-500 text-[10px]">
-                    TOTAL
-                  </Badge>
+                  <Badge className="absolute top-2 right-2 bg-red-500 text-[10px]">TOTAL</Badge>
                   <Crown className="w-6 h-6 text-purple-500 mb-2" />
                   <p className="font-semibold text-sm">Admin</p>
-                  <p className="text-xs text-muted-foreground">
-                    Controle total
-                  </p>
+                  <p className="text-xs text-muted-foreground">Controle total</p>
                 </button>
               </div>
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
               Cancelar
             </Button>
             <Button
               className="bg-purple-600 hover:bg-purple-700"
-              disabled={!formData.nome_completo || !formData.email || !formData.password || formData.password.length < 8 || createUserMutation.isPending}
+              disabled={
+                !formData.nome_completo ||
+                !formData.email ||
+                !formData.password ||
+                formData.password.length < 8 ||
+                createUserMutation.isPending
+              }
               onClick={() => createUserMutation.mutate(formData)}
             >
               {createUserMutation.isPending ? (
@@ -588,33 +584,32 @@ export default function AdminUsersPage() {
               Editar Usuário
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="edit-nome">Nome Completo</Label>
               <Input
                 id="edit-nome"
                 value={formData.nome_completo}
-                onChange={(e) => setFormData(prev => ({ ...prev, nome_completo: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, nome_completo: e.target.value }))
+                }
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="edit-email">Email</Label>
-              <Input
-                id="edit-email"
-                value={formData.email}
-                disabled
-                className="bg-gray-100"
-              />
+              <Input id="edit-email" value={formData.email} disabled className="bg-gray-100" />
               <p className="text-xs text-muted-foreground">Email não pode ser alterado</p>
             </div>
-            
+
             <div className="space-y-2">
               <Label>Nível de Acesso</Label>
-              <Select 
-                value={formData.role} 
-                onValueChange={(value: 'admin' | 'user' | 'entregador') => setFormData(prev => ({ ...prev, role: value }))}
+              <Select
+                value={formData.role}
+                onValueChange={(value: 'admin' | 'user' | 'entregador') =>
+                  setFormData((prev) => ({ ...prev, role: value }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -627,7 +622,7 @@ export default function AdminUsersPage() {
               </Select>
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
               Cancelar
@@ -643,7 +638,7 @@ export default function AdminUsersPage() {
                       nome_completo: formData.nome_completo,
                       role: formData.role,
                     },
-                  });
+                  })
                 }
               }}
             >
@@ -665,9 +660,15 @@ export default function AdminUsersPage() {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <div className="flex items-center gap-4">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold ${
-                selectedUser?.role === 'admin' ? 'bg-purple-600' : selectedUser?.role === 'entregador' ? 'bg-orange-500' : 'bg-blue-500'
-              }`}>
+              <div
+                className={`w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold ${
+                  selectedUser?.role === 'admin'
+                    ? 'bg-purple-600'
+                    : selectedUser?.role === 'entregador'
+                      ? 'bg-orange-500'
+                      : 'bg-blue-500'
+                }`}
+              >
                 {(selectedUser?.nome_completo || selectedUser?.email || 'U')[0].toUpperCase()}
               </div>
               <div>
@@ -686,18 +687,20 @@ export default function AdminUsersPage() {
                     ENTREGADOR
                   </Badge>
                 ) : (
-                  <Badge variant="secondary" className="mt-1">USUÁRIO</Badge>
+                  <Badge variant="secondary" className="mt-1">
+                    USUÁRIO
+                  </Badge>
                 )}
               </div>
             </div>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">Data de Cadastro</p>
                 <p className="font-medium">
-                  {selectedUser?.created_at 
+                  {selectedUser?.created_at
                     ? format(new Date(selectedUser.created_at), 'dd/MM/yyyy HH:mm')
                     : '-'}
                 </p>
@@ -708,22 +711,22 @@ export default function AdminUsersPage() {
               </div>
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
               Fechar
             </Button>
             <Button
               onClick={() => {
-                setIsViewModalOpen(false);
+                setIsViewModalOpen(false)
                 if (selectedUser) {
                   setFormData({
                     nome_completo: selectedUser.nome_completo || '',
                     email: selectedUser.email,
                     password: '',
                     role: selectedUser.role,
-                  });
-                  setIsEditModalOpen(true);
+                  })
+                  setIsEditModalOpen(true)
                 }
               }}
             >
@@ -741,8 +744,8 @@ export default function AdminUsersPage() {
             <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
             <AlertDialogDescription>
               Tem certeza que deseja remover o usuário{' '}
-              <strong>{selectedUser?.nome_completo || selectedUser?.email}</strong>?
-              Esta ação não pode ser desfeita.
+              <strong>{selectedUser?.nome_completo || selectedUser?.email}</strong>? Esta ação não
+              pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -765,11 +768,11 @@ export default function AdminUsersPage() {
       <ResetPasswordModal
         isOpen={isResetPasswordModalOpen}
         onClose={() => {
-          setIsResetPasswordModalOpen(false);
-          setSelectedUser(null);
+          setIsResetPasswordModalOpen(false)
+          setSelectedUser(null)
         }}
         user={selectedUser}
       />
     </AdminLayout>
-  );
+  )
 }

@@ -1,27 +1,25 @@
-import { Calendar, MapPin, User, Star, FileText } from 'lucide-react';
-import { EntregaFinalizada } from '@/hooks/useEntregasFinalizadas';
-import { StatusBadge } from '@/components/ui/status-badge';
-import { Badge } from '@/components/ui/badge';
-import { PhotoGallery } from './PhotoGallery';
-import { MaterialDisplay } from '@/components/separacao/MaterialDisplay';
-import { format, parseISO } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { Calendar, MapPin, User, Star, FileText } from 'lucide-react'
+import { EntregaFinalizada } from '@/hooks/useEntregasFinalizadas'
+import { StatusBadge } from '@/components/ui/status-badge'
+import { Badge } from '@/components/ui/badge'
+import { PhotoGallery } from './PhotoGallery'
+import { MaterialDisplay } from '@/components/separacao/MaterialDisplay'
+import { format, parseISO } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 interface EntregaFinalizadaCardProps {
-  entrega: EntregaFinalizada;
+  entrega: EntregaFinalizada
 }
 
 export function EntregaFinalizadaCard({ entrega }: EntregaFinalizadaCardProps) {
-  const formattedDate = format(
-    parseISO(entrega.data_entrega_real), 
-    "dd/MM/yyyy 'às' HH:mm", 
-    { locale: ptBR }
-  );
+  const formattedDate = format(parseISO(entrega.data_entrega_real), "dd/MM/yyyy 'às' HH:mm", {
+    locale: ptBR,
+  })
 
   // Parse numero_pedido back to array for display
-  const vendas = entrega.numero_pedido 
-    ? entrega.numero_pedido.split(', ').filter(v => v.trim())
-    : [];
+  const vendas = entrega.numero_pedido
+    ? entrega.numero_pedido.split(', ').filter((v) => v.trim())
+    : []
 
   return (
     <div className="bg-card rounded-xl shadow-card p-6 card-finalizado">
@@ -42,12 +40,19 @@ export function EntregaFinalizadaCard({ entrega }: EntregaFinalizadaCardProps) {
           </p>
           <div className="flex flex-wrap gap-1.5">
             {vendas.slice(0, 5).map((venda, idx) => (
-              <Badge key={idx} variant="secondary" className="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-xl">
+              <Badge
+                key={idx}
+                variant="secondary"
+                className="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-xl"
+              >
                 {venda}
               </Badge>
             ))}
             {vendas.length > 5 && (
-              <Badge variant="secondary" className="bg-blue-50 text-blue-600 text-xs px-2.5 py-1 rounded-xl">
+              <Badge
+                variant="secondary"
+                className="bg-blue-50 text-blue-600 text-xs px-2.5 py-1 rounded-xl"
+              >
                 +{vendas.length - 5} mais
               </Badge>
             )}
@@ -133,5 +138,5 @@ export function EntregaFinalizadaCard({ entrega }: EntregaFinalizadaCardProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

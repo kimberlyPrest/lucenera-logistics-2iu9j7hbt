@@ -1,55 +1,67 @@
-import { useState, useMemo } from 'react';
-import { Search, AlertCircle, RefreshCw } from 'lucide-react';
-import { AppLayout } from '@/components/layout/AppLayout';
-import { FilterDropdown } from '@/components/ui/filter-dropdown';
-import { EntregaFinalizadaRow } from '@/components/finalizadas/EntregaFinalizadaRow';
-import { EntregaDetalhesModal } from '@/components/finalizadas/EntregaDetalhesModal';
-import { FinalizadasListSkeleton } from '@/components/finalizadas/FinalizadasListSkeleton';
-import { EmptyState } from '@/components/separacao/EmptyState';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useEntregasFinalizadas, EntregaFinalizada } from '@/hooks/useEntregasFinalizadas';
-import { FiltroSegmento } from '@/types/separacao';
-import { subDays, subMonths, isAfter, startOfDay, parseISO, format } from 'date-fns';
+import { useState, useMemo } from 'react'
+import { Search, AlertCircle, RefreshCw } from 'lucide-react'
+import { AppLayout } from '@/components/layout/AppLayout'
+import { FilterDropdown } from '@/components/ui/filter-dropdown'
+import { EntregaFinalizadaRow } from '@/components/finalizadas/EntregaFinalizadaRow'
+import { EntregaDetalhesModal } from '@/components/finalizadas/EntregaDetalhesModal'
+import { FinalizadasListSkeleton } from '@/components/finalizadas/FinalizadasListSkeleton'
+import { EmptyState } from '@/components/separacao/EmptyState'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { useEntregasFinalizadas, EntregaFinalizada } from '@/hooks/useEntregasFinalizadas'
+import { FiltroSegmento } from '@/types/separacao'
+import { subDays, subMonths, isAfter, startOfDay, parseISO, format } from 'date-fns'
 
 export default function EntregasFinalizadasPage() {
-  const [filtro, setFiltro] = useState<FiltroSegmento>('todas');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedEntrega, setSelectedEntrega] = useState<EntregaFinalizada | null>(null);
-  const { entregas, isLoading, error, refetch } = useEntregasFinalizadas();
+  const [filtro, setFiltro] = useState<FiltroSegmento>('todas')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedEntrega, setSelectedEntrega] = useState<EntregaFinalizada | null>(null)
+  const { entregas, isLoading, error, refetch } = useEntregasFinalizadas()
 
   const filteredEntregas = useMemo(() => {
-    const today = startOfDay(new Date());
-    let startDate: Date | null = null;
+    const today = startOfDay(new Date())
+    let startDate: Date | null = null
 
     switch (filtro) {
-      case 'ultima-semana': startDate = subDays(today, 7); break;
-      case 'ultimo-mes': startDate = subMonths(today, 1); break;
-      case 'ultimos-3-meses': startDate = subMonths(today, 3); break;
-      case 'ultimos-6-meses': startDate = subMonths(today, 6); break;
-      default: startDate = null;
+      case 'ultima-semana':
+        startDate = subDays(today, 7)
+        break
+      case 'ultimo-mes':
+        startDate = subMonths(today, 1)
+        break
+      case 'ultimos-3-meses':
+        startDate = subMonths(today, 3)
+        break
+      case 'ultimos-6-meses':
+        startDate = subMonths(today, 6)
+        break
+      default:
+        startDate = null
     }
 
     return entregas
       .filter((e) => {
         if (startDate) {
-          const entregaDate = startOfDay(parseISO(e.data_entrega_real));
-          if (!isAfter(entregaDate, startDate) &&
-              format(entregaDate, 'yyyy-MM-dd') !== format(startDate, 'yyyy-MM-dd')) {
-            return false;
+          const entregaDate = startOfDay(parseISO(e.data_entrega_real))
+          if (
+            !isAfter(entregaDate, startDate) &&
+            format(entregaDate, 'yyyy-MM-dd') !== format(startDate, 'yyyy-MM-dd')
+          ) {
+            return false
           }
         }
         if (searchQuery.trim()) {
-          const query = searchQuery.toLowerCase();
+          const query = searchQuery.toLowerCase()
           return (
-            e.cliente.toLowerCase().includes(query) ||
-            e.codigo_obra.toLowerCase().includes(query)
-          );
+            e.cliente.toLowerCase().includes(query) || e.codigo_obra.toLowerCase().includes(query)
+          )
         }
-        return true;
+        return true
       })
-      .sort((a, b) => new Date(b.data_entrega_real).getTime() - new Date(a.data_entrega_real).getTime());
-  }, [entregas, filtro, searchQuery]);
+      .sort(
+        (a, b) => new Date(b.data_entrega_real).getTime() - new Date(a.data_entrega_real).getTime(),
+      )
+  }, [entregas, filtro, searchQuery])
 
   return (
     <AppLayout>
@@ -114,5 +126,5 @@ export default function EntregasFinalizadasPage() {
         onUpdated={refetch}
       />
     </AppLayout>
-  );
+  )
 }

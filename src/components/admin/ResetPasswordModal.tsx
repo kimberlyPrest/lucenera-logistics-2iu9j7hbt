@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import { supabase } from '@/integrations/supabase/client'
 import {
   Dialog,
   DialogContent,
@@ -8,45 +8,45 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { 
-  Key, 
-  Eye, 
-  EyeOff, 
-  RefreshCw, 
-  Copy, 
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Key,
+  Eye,
+  EyeOff,
+  RefreshCw,
+  Copy,
   Check,
   AlertTriangle,
   Loader2,
-  Lock
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
+  Lock,
+} from 'lucide-react'
+import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 
 interface ResetPasswordModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
   user: {
-    user_id: string;
-    email: string;
-    nome_completo: string | null;
-  } | null;
+    user_id: string
+    email: string
+    nome_completo: string | null
+  } | null
 }
 
 interface PasswordStrength {
-  score: number;
-  label: string;
-  color: string;
+  score: number
+  label: string
+  color: string
   criteria: {
-    minLength: boolean;
-    hasUppercase: boolean;
-    hasLowercase: boolean;
-    hasNumber: boolean;
-    hasSpecial: boolean;
-  };
+    minLength: boolean
+    hasUppercase: boolean
+    hasLowercase: boolean
+    hasNumber: boolean
+    hasSpecial: boolean
+  }
 }
 
 function calculatePasswordStrength(password: string): PasswordStrength {
@@ -56,118 +56,121 @@ function calculatePasswordStrength(password: string): PasswordStrength {
     hasLowercase: /[a-z]/.test(password),
     hasNumber: /[0-9]/.test(password),
     hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-  };
-
-  const metCriteria = Object.values(criteria).filter(Boolean).length;
-  const score = (metCriteria / 5) * 100;
-
-  let label: string;
-  let color: string;
-
-  if (score <= 40) {
-    label = 'Fraca';
-    color = 'bg-destructive';
-  } else if (score <= 70) {
-    label = 'Média';
-    color = 'bg-orange-500';
-  } else {
-    label = 'Forte';
-    color = 'bg-green-500';
   }
 
-  return { score, label, color, criteria };
+  const metCriteria = Object.values(criteria).filter(Boolean).length
+  const score = (metCriteria / 5) * 100
+
+  let label: string
+  let color: string
+
+  if (score <= 40) {
+    label = 'Fraca'
+    color = 'bg-destructive'
+  } else if (score <= 70) {
+    label = 'Média'
+    color = 'bg-orange-500'
+  } else {
+    label = 'Forte'
+    color = 'bg-green-500'
+  }
+
+  return { score, label, color, criteria }
 }
 
 function generateStrongPassword(): string {
-  const prefixes = ['Lucenera', 'Entrega', 'Sistema', 'Acesso'];
-  const year = new Date().getFullYear();
-  const symbols = ['!', '@', '#', '$', '%', '&', '*'];
-  const alphanumeric = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-  
-  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-  const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-  let suffix = '';
+  const prefixes = ['Lucenera', 'Entrega', 'Sistema', 'Acesso']
+  const year = new Date().getFullYear()
+  const symbols = ['!', '@', '#', '$', '%', '&', '*']
+  const alphanumeric = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
+
+  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)]
+  const symbol = symbols[Math.floor(Math.random() * symbols.length)]
+  let suffix = ''
   for (let i = 0; i < 3; i++) {
-    suffix += alphanumeric.charAt(Math.floor(Math.random() * alphanumeric.length));
+    suffix += alphanumeric.charAt(Math.floor(Math.random() * alphanumeric.length))
   }
-  
-  return `${prefix}${year}${symbol}${suffix}`;
+
+  return `${prefix}${year}${symbol}${suffix}`
 }
 
 export function ResetPasswordModal({ isOpen, onClose, user }: ResetPasswordModalProps) {
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [copied, setCopied] = useState(false)
 
-  const passwordStrength = calculatePasswordStrength(newPassword);
-  const passwordsMatch = newPassword === confirmPassword && confirmPassword.length > 0;
-  const isValidPassword = newPassword.length >= 8 && passwordsMatch;
+  const passwordStrength = calculatePasswordStrength(newPassword)
+  const passwordsMatch = newPassword === confirmPassword && confirmPassword.length > 0
+  const isValidPassword = newPassword.length >= 8 && passwordsMatch
 
   // Reset form when modal opens/closes
   useEffect(() => {
     if (!isOpen) {
-      setNewPassword('');
-      setConfirmPassword('');
-      setShowPassword(false);
-      setShowConfirmPassword(false);
-      setCopied(false);
+      setNewPassword('')
+      setConfirmPassword('')
+      setShowPassword(false)
+      setShowConfirmPassword(false)
+      setCopied(false)
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   const resetPasswordMutation = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error('Usuário não selecionado');
+      if (!user) throw new Error('Usuário não selecionado')
 
       const { data, error } = await supabase.functions.invoke('reset-user-password', {
         body: {
           userId: user.user_id,
           newPassword,
         },
-      });
+      })
 
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      
-      return data;
+      if (error) throw error
+      if (data?.error) throw new Error(data.error)
+
+      return data
     },
     onSuccess: () => {
       // Copy password to clipboard
-      navigator.clipboard.writeText(newPassword).then(() => {
-        toast.success('Senha redefinida com sucesso!', {
-          description: `Senha de ${user?.nome_completo || user?.email} alterada e copiada para área de transferência.`,
-        });
-      }).catch(() => {
-        toast.success('Senha redefinida com sucesso!', {
-          description: `Comunique ${user?.nome_completo || user?.email} sobre a nova senha.`,
-        });
-      });
-      onClose();
+      navigator.clipboard
+        .writeText(newPassword)
+        .then(() => {
+          toast.success('Senha redefinida com sucesso!', {
+            description: `Senha de ${user?.nome_completo || user?.email} alterada e copiada para área de transferência.`,
+          })
+        })
+        .catch(() => {
+          toast.success('Senha redefinida com sucesso!', {
+            description: `Comunique ${user?.nome_completo || user?.email} sobre a nova senha.`,
+          })
+        })
+      onClose()
     },
     onError: (error: Error) => {
       toast.error('Erro ao redefinir senha', {
         description: error.message,
-      });
+      })
     },
-  });
+  })
 
   const handleGeneratePassword = () => {
-    const password = generateStrongPassword();
-    setNewPassword(password);
-    setConfirmPassword(password);
-  };
+    const password = generateStrongPassword()
+    setNewPassword(password)
+    setConfirmPassword(password)
+  }
 
   const handleCopyPassword = async () => {
     try {
-      await navigator.clipboard.writeText(newPassword);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast.success('Senha copiada!');
+      await navigator.clipboard.writeText(newPassword)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+      toast.success('Senha copiada!')
     } catch {
-      toast.error('Erro ao copiar senha');
+      toast.error('Erro ao copiar senha')
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -209,11 +212,13 @@ export function ResetPasswordModal({ isOpen, onClose, user }: ResetPasswordModal
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className={cn(
-                    "pl-10 pr-10 h-14",
-                    newPassword.length > 0 && (
-                      passwordStrength.score <= 40 ? "border-destructive" :
-                      passwordStrength.score <= 70 ? "border-orange-500" : "border-green-500"
-                    )
+                    'pl-10 pr-10 h-14',
+                    newPassword.length > 0 &&
+                      (passwordStrength.score <= 40
+                        ? 'border-destructive'
+                        : passwordStrength.score <= 70
+                          ? 'border-orange-500'
+                          : 'border-green-500'),
                   )}
                 />
                 <Button
@@ -242,34 +247,69 @@ export function ResetPasswordModal({ isOpen, onClose, user }: ResetPasswordModal
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <div className="h-2 flex-1 bg-secondary rounded-full overflow-hidden">
-                    <div 
-                      className={cn("h-full transition-all", passwordStrength.color)}
+                    <div
+                      className={cn('h-full transition-all', passwordStrength.color)}
                       style={{ width: `${passwordStrength.score}%` }}
                     />
                   </div>
-                  <span className={cn(
-                    "text-sm font-medium",
-                    passwordStrength.score <= 40 ? "text-destructive" :
-                    passwordStrength.score <= 70 ? "text-orange-500" : "text-green-500"
-                  )}>
+                  <span
+                    className={cn(
+                      'text-sm font-medium',
+                      passwordStrength.score <= 40
+                        ? 'text-destructive'
+                        : passwordStrength.score <= 70
+                          ? 'text-orange-500'
+                          : 'text-green-500',
+                    )}
+                  >
                     {passwordStrength.label}
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-1 text-xs">
-                  <span className={passwordStrength.criteria.minLength ? "text-green-600" : "text-muted-foreground"}>
-                    {passwordStrength.criteria.minLength ? "✓" : "○"} Mínimo 8 caracteres
+                  <span
+                    className={
+                      passwordStrength.criteria.minLength
+                        ? 'text-green-600'
+                        : 'text-muted-foreground'
+                    }
+                  >
+                    {passwordStrength.criteria.minLength ? '✓' : '○'} Mínimo 8 caracteres
                   </span>
-                  <span className={passwordStrength.criteria.hasUppercase ? "text-green-600" : "text-muted-foreground"}>
-                    {passwordStrength.criteria.hasUppercase ? "✓" : "○"} Letra maiúscula
+                  <span
+                    className={
+                      passwordStrength.criteria.hasUppercase
+                        ? 'text-green-600'
+                        : 'text-muted-foreground'
+                    }
+                  >
+                    {passwordStrength.criteria.hasUppercase ? '✓' : '○'} Letra maiúscula
                   </span>
-                  <span className={passwordStrength.criteria.hasLowercase ? "text-green-600" : "text-muted-foreground"}>
-                    {passwordStrength.criteria.hasLowercase ? "✓" : "○"} Letra minúscula
+                  <span
+                    className={
+                      passwordStrength.criteria.hasLowercase
+                        ? 'text-green-600'
+                        : 'text-muted-foreground'
+                    }
+                  >
+                    {passwordStrength.criteria.hasLowercase ? '✓' : '○'} Letra minúscula
                   </span>
-                  <span className={passwordStrength.criteria.hasNumber ? "text-green-600" : "text-muted-foreground"}>
-                    {passwordStrength.criteria.hasNumber ? "✓" : "○"} Número
+                  <span
+                    className={
+                      passwordStrength.criteria.hasNumber
+                        ? 'text-green-600'
+                        : 'text-muted-foreground'
+                    }
+                  >
+                    {passwordStrength.criteria.hasNumber ? '✓' : '○'} Número
                   </span>
-                  <span className={passwordStrength.criteria.hasSpecial ? "text-green-600" : "text-muted-foreground"}>
-                    {passwordStrength.criteria.hasSpecial ? "✓" : "○"} Caractere especial
+                  <span
+                    className={
+                      passwordStrength.criteria.hasSpecial
+                        ? 'text-green-600'
+                        : 'text-muted-foreground'
+                    }
+                  >
+                    {passwordStrength.criteria.hasSpecial ? '✓' : '○'} Caractere especial
                   </span>
                 </div>
               </div>
@@ -301,7 +341,10 @@ export function ResetPasswordModal({ isOpen, onClose, user }: ResetPasswordModal
 
           {/* Confirm Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="confirm-password" className="text-xs font-semibold uppercase tracking-wide">
+            <Label
+              htmlFor="confirm-password"
+              className="text-xs font-semibold uppercase tracking-wide"
+            >
               Confirmar Senha
             </Label>
             <div className="relative">
@@ -313,10 +356,9 @@ export function ResetPasswordModal({ isOpen, onClose, user }: ResetPasswordModal
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className={cn(
-                  "pl-10 pr-10 h-14",
-                  confirmPassword.length > 0 && (
-                    passwordsMatch ? "border-green-500" : "border-destructive"
-                  )
+                  'pl-10 pr-10 h-14',
+                  confirmPassword.length > 0 &&
+                    (passwordsMatch ? 'border-green-500' : 'border-destructive'),
                 )}
               />
               <Button
@@ -330,11 +372,8 @@ export function ResetPasswordModal({ isOpen, onClose, user }: ResetPasswordModal
               </Button>
             </div>
             {confirmPassword.length > 0 && (
-              <p className={cn(
-                "text-sm",
-                passwordsMatch ? "text-green-600" : "text-destructive"
-              )}>
-                {passwordsMatch ? "✓ Senhas coincidem" : "✗ Senhas não coincidem"}
+              <p className={cn('text-sm', passwordsMatch ? 'text-green-600' : 'text-destructive')}>
+                {passwordsMatch ? '✓ Senhas coincidem' : '✗ Senhas não coincidem'}
               </p>
             )}
           </div>
@@ -344,7 +383,9 @@ export function ResetPasswordModal({ isOpen, onClose, user }: ResetPasswordModal
             <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-amber-800">
               <p className="font-medium">Aviso de Segurança</p>
-              <p>O usuário precisará fazer login novamente com a nova senha. Comunique a mudança.</p>
+              <p>
+                O usuário precisará fazer login novamente com a nova senha. Comunique a mudança.
+              </p>
             </div>
           </div>
         </div>
@@ -373,5 +414,5 @@ export function ResetPasswordModal({ isOpen, onClose, user }: ResetPasswordModal
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

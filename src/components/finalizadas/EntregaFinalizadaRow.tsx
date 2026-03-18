@@ -1,22 +1,25 @@
-import { Eye, User, Clock, Shield } from 'lucide-react';
-import { EntregaFinalizada } from '@/hooks/useEntregasFinalizadas';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { format, parseISO, differenceInCalendarDays } from 'date-fns';
+import { Eye, User, Clock, Shield } from 'lucide-react'
+import { EntregaFinalizada } from '@/hooks/useEntregasFinalizadas'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { format, parseISO, differenceInCalendarDays } from 'date-fns'
 
 interface EntregaFinalizadaRowProps {
-  entrega: EntregaFinalizada;
-  onOpenDetails: (entrega: EntregaFinalizada) => void;
+  entrega: EntregaFinalizada
+  onOpenDetails: (entrega: EntregaFinalizada) => void
 }
 
 export function EntregaFinalizadaRow({ entrega, onOpenDetails }: EntregaFinalizadaRowProps) {
-  const formattedDate = format(parseISO(entrega.data_entrega_real), 'dd/MM/yyyy');
+  const formattedDate = format(parseISO(entrega.data_entrega_real), 'dd/MM/yyyy')
 
   const diasParaEntrega = entrega.data_solicitacao
-    ? differenceInCalendarDays(parseISO(entrega.data_entrega_real), parseISO(entrega.data_solicitacao))
-    : null;
+    ? differenceInCalendarDays(
+        parseISO(entrega.data_entrega_real),
+        parseISO(entrega.data_solicitacao),
+      )
+    : null
 
-  const isGarantia = entrega.tipo_pedido === 'garantia';
+  const isGarantia = entrega.tipo_pedido === 'garantia'
 
   return (
     <div className="flex items-center gap-3 px-4 h-14 border-b border-border bg-card hover:bg-muted/50 transition-colors uppercase">
@@ -52,7 +55,10 @@ export function EntregaFinalizadaRow({ entrega, onOpenDetails }: EntregaFinaliza
 
       {/* Tempo solicitação → entrega */}
       {diasParaEntrega !== null && (
-        <Badge variant="outline" className="hidden sm:flex items-center gap-1 shrink-0 text-[11px] bg-blue-50 text-blue-700 border-blue-200">
+        <Badge
+          variant="outline"
+          className="hidden sm:flex items-center gap-1 shrink-0 text-[11px] bg-blue-50 text-blue-700 border-blue-200"
+        >
           <Clock className="w-3 h-3" />
           {diasParaEntrega === 0 ? 'No mesmo dia' : `${diasParaEntrega}d`}
         </Badge>
@@ -77,5 +83,5 @@ export function EntregaFinalizadaRow({ entrega, onOpenDetails }: EntregaFinaliza
         Detalhes
       </Button>
     </div>
-  );
+  )
 }

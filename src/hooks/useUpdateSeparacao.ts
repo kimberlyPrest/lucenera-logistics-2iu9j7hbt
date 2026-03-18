@@ -1,67 +1,65 @@
-import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { MaterialTipo, SeparacaoItem, DeliveryType } from './useCreateSeparacao';
+import { useState } from 'react'
+import { supabase } from '@/integrations/supabase/client'
+import { useToast } from '@/hooks/use-toast'
+import { MaterialTipo, SeparacaoItem, DeliveryType } from './useCreateSeparacao'
 
 export interface UpdateSeparacaoData {
-  id: string;
-  codigo_obra: string;
-  numero_venda?: string[];
-  separacoes_parciais?: string[];
-  solicitante?: string;
-  gestora_equipe: string;
-  cliente: string;
-  data_entrega: string;
-  responsavel_recebimento: string;
-  telefone: string | null;
-  endereco: string;
-  material_tipo: MaterialTipo | null;
-  material_conteudo: string | null;
-  delivery_type: DeliveryType;
-  scheduled_time?: string | null;
-  observacoes_internas?: string | null;
-  nivel_complexidade?: 'facil' | 'medio' | 'dificil';
-  tipo_entrega?: 'lucenera_entrega' | 'transportadora' | 'cliente_retira' | 'correios';
-  transportadora_nome?: string | null;
-  codigo_rastreamento?: string | null;
-  tipo_pedido?: string;
-  garantia_detalhes?: string | null;
-  inclui_garantia?: boolean;
-  garantia_peca?: string | null;
-  garantia_motivo?: string | null;
-  items?: SeparacaoItem[];
+  id: string
+  codigo_obra: string
+  numero_venda?: string[]
+  separacoes_parciais?: string[]
+  solicitante?: string
+  gestora_equipe: string
+  cliente: string
+  data_entrega: string
+  responsavel_recebimento: string
+  telefone: string | null
+  endereco: string
+  material_tipo: MaterialTipo | null
+  material_conteudo: string | null
+  delivery_type: DeliveryType
+  scheduled_time?: string | null
+  observacoes_internas?: string | null
+  nivel_complexidade?: 'facil' | 'medio' | 'dificil'
+  tipo_entrega?: 'lucenera_entrega' | 'transportadora' | 'cliente_retira' | 'correios'
+  transportadora_nome?: string | null
+  codigo_rastreamento?: string | null
+  tipo_pedido?: string
+  garantia_detalhes?: string | null
+  inclui_garantia?: boolean
+  garantia_peca?: string | null
+  garantia_motivo?: string | null
+  items?: SeparacaoItem[]
 }
 
 export function useUpdateSeparacao() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { toast } = useToast()
 
   const uploadMaterial = async (
     file: File,
     codigoObra: string,
-    tipo: 'pdf' | 'imagem'
+    tipo: 'pdf' | 'imagem',
   ): Promise<string> => {
-    const extension = file.name.split('.').pop() || (tipo === 'pdf' ? 'pdf' : 'jpg');
-    const timestamp = Date.now();
-    const filePath = `${codigoObra}/material_${timestamp}.${extension}`;
+    const extension = file.name.split('.').pop() || (tipo === 'pdf' ? 'pdf' : 'jpg')
+    const timestamp = Date.now()
+    const filePath = `${codigoObra}/material_${timestamp}.${extension}`
 
     const { error: uploadError } = await supabase.storage
       .from('materiais-separacao')
-      .upload(filePath, file);
+      .upload(filePath, file)
 
     if (uploadError) {
-      throw new Error(`Erro ao enviar arquivo: ${uploadError.message}`);
+      throw new Error(`Erro ao enviar arquivo: ${uploadError.message}`)
     }
 
-    const { data: urlData } = supabase.storage
-      .from('materiais-separacao')
-      .getPublicUrl(filePath);
+    const { data: urlData } = supabase.storage.from('materiais-separacao').getPublicUrl(filePath)
 
-    return urlData.publicUrl;
-  };
+    return urlData.publicUrl
+  }
 
   const updateSeparacao = async (data: UpdateSeparacaoData): Promise<boolean> => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
     try {
       // Step 1: Update main separacao record
@@ -94,10 +92,10 @@ export function useUpdateSeparacao() {
           garantia_motivo: data.garantia_motivo || null,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', data.id);
+        .eq('id', data.id)
 
       if (updateError) {
-        throw new Error(`Erro ao atualizar separação: ${updateError.message}`);
+        throw new Error(`Erro ao atualizar separação: ${updateError.message}`)
       }
 
       // Step 2: If material_tipo is 'tabela', update items
@@ -106,10 +104,10 @@ export function useUpdateSeparacao() {
         const { error: deleteError } = await supabase
           .from('separacao_itens')
           .delete()
-          .eq('separacao_id', data.id);
+          .eq('separacao_id', data.id)
 
         if (deleteError) {
-          throw new Error(`Erro ao remover itens antigos: ${deleteError.message}`);
+          throw new Error(`Erro ao remover itens antigos: ${deleteError.message}`)
         }
 
         // Then insert new items if any
@@ -124,14 +122,12 @@ export function useUpdateSeparacao() {
             quantidade: item.quantidade,
             local: (item as any).local || null,
             marca: (item as any).marca || null,
-          }));
+          }))
 
-          const { error: itemsError } = await supabase
-            .from('separacao_itens')
-            .insert(itemsToInsert);
+          const { error: itemsError } = await supabase.from('separacao_itens').insert(itemsToInsert)
 
           if (itemsError) {
-            throw new Error(`Erro ao salvar itens: ${itemsError.message}`);
+            throw new Error(`Erro ao salvar itens: ${itemsError.message}`)
           }
         }
       }
@@ -141,29 +137,29 @@ export function useUpdateSeparacao() {
         title: `Separação ${data.codigo_obra} atualizada! ✏️`,
         description: 'As alterações foram salvas.',
         className: 'bg-success text-success-foreground border-none',
-      });
+      })
 
       if (navigator.vibrate) {
-        navigator.vibrate(200);
+        navigator.vibrate(200)
       }
 
-      return true;
+      return true
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Erro ao atualizar separação';
+      const message = err instanceof Error ? err.message : 'Erro ao atualizar separação'
       toast({
         title: 'Erro ao atualizar separação',
         description: message,
         variant: 'destructive',
-      });
-      return false;
+      })
+      return false
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return {
     updateSeparacao,
     uploadMaterial,
     isSubmitting,
-  };
+  }
 }

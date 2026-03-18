@@ -1,14 +1,7 @@
-import { AdminLayout } from '@/components/admin/AdminLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Code2, 
-  Palette, 
-  Image, 
-  Type,
-  AlertTriangle,
-  Construction
-} from 'lucide-react';
+import { AdminLayout } from '@/components/admin/AdminLayout'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Code2, Palette, Image, Type, AlertTriangle, Construction } from 'lucide-react'
 
 export default function AdminDevPage() {
   return (
@@ -50,7 +43,7 @@ export default function AdminDevPage() {
                 </p>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4">
               <div className="space-y-1">
                 <div className="w-full h-12 rounded-lg bg-blue-600" />
@@ -179,5 +172,5 @@ export default function AdminDevPage() {
         </Card>
       </div>
     </AdminLayout>
-  );
+  )
 }

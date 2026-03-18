@@ -1,23 +1,40 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { FileText, Upload, X, Loader2, CheckCircle, AlertCircle, Plus, Trash2, Pencil, RefreshCw, Package, Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
-import { cn } from '@/lib/utils';
-import { usePdfExtraction, ExtractedItem } from '@/hooks/usePdfExtraction';
-import { TableItem } from './ItemsTableInput';
+import { useState, useRef, useCallback, useEffect } from 'react'
+import {
+  FileText,
+  Upload,
+  X,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  Plus,
+  Trash2,
+  Pencil,
+  RefreshCw,
+  Package,
+  Download,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
+import { cn } from '@/lib/utils'
+import { usePdfExtraction, ExtractedItem } from '@/hooks/usePdfExtraction'
+import { TableItem } from './ItemsTableInput'
 
 interface PdfExtractorUploaderProps {
-  onItemsExtracted: (items: TableItem[]) => void;
-  existingItems?: TableItem[];
-  onFilesSelected?: (files: File[]) => void;
+  onItemsExtracted: (items: TableItem[]) => void
+  existingItems?: TableItem[]
+  onFilesSelected?: (files: File[]) => void
 }
 
-export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onFilesSelected }: PdfExtractorUploaderProps) {
-  const [isDragging, setIsDragging] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
+export function PdfExtractorUploader({
+  onItemsExtracted,
+  existingItems = [],
+  onFilesSelected,
+}: PdfExtractorUploaderProps) {
+  const [isDragging, setIsDragging] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const {
     isProcessing,
@@ -29,12 +46,12 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
     updateItem,
     removeItem,
     addManualItem,
-  } = usePdfExtraction();
+  } = usePdfExtraction()
 
   // Initialize with existing items if any
   useEffect(() => {
     if (existingItems.length > 0 && extractedItems.length === 0) {
-      const converted: ExtractedItem[] = existingItems.map(item => ({
+      const converted: ExtractedItem[] = existingItems.map((item) => ({
         id: item.id,
         ordem: item.ordem,
         id_lote: item.id_lote || '',
@@ -44,67 +61,82 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
         descricao: item.descricao,
         marca: (item as any).marca || '',
         quantidade: item.quantidade,
-      }));
-      setExtractedItems(converted);
+      }))
+      setExtractedItems(converted)
     }
-  }, [existingItems]);
+  }, [existingItems])
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  }, []);
+    e.preventDefault()
+    setIsDragging(true)
+  }, [])
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  }, []);
+    e.preventDefault()
+    setIsDragging(false)
+  }, [])
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      setIsDragging(false)
 
-    const files = Array.from(e.dataTransfer.files).filter(f => f.type === 'application/pdf');
-    if (files.length > 0) {
-      processPdfFiles(files);
-      onFilesSelected?.(files);
-    }
-  }, [processPdfFiles, onFilesSelected]);
+      const files = Array.from(e.dataTransfer.files).filter((f) => f.type === 'application/pdf')
+      if (files.length > 0) {
+        processPdfFiles(files)
+        onFilesSelected?.(files)
+      }
+    },
+    [processPdfFiles, onFilesSelected],
+  )
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []).filter(f => f.type === 'application/pdf');
+    const files = Array.from(e.target.files || []).filter((f) => f.type === 'application/pdf')
     if (files.length > 0) {
-      processPdfFiles(files);
-      onFilesSelected?.(files);
+      processPdfFiles(files)
+      onFilesSelected?.(files)
     }
     if (inputRef.current) {
-      inputRef.current.value = '';
+      inputRef.current.value = ''
     }
-  };
+  }
 
   const handleReprocess = () => {
-    inputRef.current?.click();
-  };
+    inputRef.current?.click()
+  }
 
   const handleConfirm = () => {
     // Convert ExtractedItem[] to TableItem[] for compatibility
-    const tableItems: TableItem[] = extractedItems.map(item => ({
-      id: item.id,
-      ordem: item.ordem,
-      id_lote: item.id_lote,
-      codigo_produto: item.codigo_produto,
-      referencia: item.referencia,
-      descricao: item.descricao,
-      quantidade: item.quantidade,
-      // Additional fields passed through
-      local: item.local,
-      marca: item.marca,
-    } as TableItem));
-    onItemsExtracted(tableItems);
-  };
+    const tableItems: TableItem[] = extractedItems.map(
+      (item) =>
+        ({
+          id: item.id,
+          ordem: item.ordem,
+          id_lote: item.id_lote,
+          codigo_produto: item.codigo_produto,
+          referencia: item.referencia,
+          descricao: item.descricao,
+          quantidade: item.quantidade,
+          // Additional fields passed through
+          local: item.local,
+          marca: item.marca,
+        }) as TableItem,
+    )
+    onItemsExtracted(tableItems)
+  }
 
   const handleExportCsv = () => {
-    const headers = ['Ordem', 'ID Lote', 'Local', 'Código', 'Referência', 'Descrição', 'Marca', 'Quantidade'];
-    const rows = extractedItems.map(item => [
+    const headers = [
+      'Ordem',
+      'ID Lote',
+      'Local',
+      'Código',
+      'Referência',
+      'Descrição',
+      'Marca',
+      'Quantidade',
+    ]
+    const rows = extractedItems.map((item) => [
       item.ordem,
       item.id_lote,
       item.local,
@@ -113,30 +145,31 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
       item.descricao,
       item.marca,
       item.quantidade,
-    ]);
+    ])
 
     const csvContent = [
       headers.join(';'),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(';')),
-    ].join('\n');
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(';')),
+    ].join('\n')
 
-    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `itens_extraidos_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-  };
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `itens_extraidos_${new Date().toISOString().split('T')[0]}.csv`
+    link.click()
+  }
 
   // Filter items based on search
   const filteredItems = searchQuery
-    ? extractedItems.filter(item =>
-        item.codigo_produto.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.descricao.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.marca.toLowerCase().includes(searchQuery.toLowerCase())
+    ? extractedItems.filter(
+        (item) =>
+          item.codigo_produto.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.descricao.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.marca.toLowerCase().includes(searchQuery.toLowerCase()),
       )
-    : extractedItems;
+    : extractedItems
 
-  const totalItemsFound = processingFiles.reduce((sum, f) => sum + f.itemsFound, 0);
+  const totalItemsFound = processingFiles.reduce((sum, f) => sum + f.itemsFound, 0)
 
   return (
     <div className="space-y-4">
@@ -151,7 +184,7 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
             'h-[200px] border-[3px] border-dashed rounded-xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-all',
             isDragging
               ? 'border-amber-500 bg-amber-50'
-              : 'border-border hover:border-amber-500 hover:bg-amber-50/50'
+              : 'border-border hover:border-amber-500 hover:bg-amber-50/50',
           )}
         >
           <input
@@ -188,12 +221,16 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
             {processingFiles.map((file, idx) => (
               <div key={idx} className="bg-white rounded-lg p-4 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <FileText className={cn(
-                    'w-6 h-6',
-                    file.status === 'done' ? 'text-green-500' :
-                    file.status === 'error' ? 'text-red-500' :
-                    'text-amber-500'
-                  )} />
+                  <FileText
+                    className={cn(
+                      'w-6 h-6',
+                      file.status === 'done'
+                        ? 'text-green-500'
+                        : file.status === 'error'
+                          ? 'text-red-500'
+                          : 'text-amber-500',
+                    )}
+                  />
                   <div className="flex-1">
                     <p className="font-medium text-sm">{file.fileName}</p>
                     {file.status === 'processing' && (
@@ -228,9 +265,7 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
             <div className="flex items-center gap-3">
               <CheckCircle className="w-6 h-6 text-green-600" />
               <div>
-                <h4 className="font-semibold text-green-800">
-                  Dados Extraídos dos PDFs
-                </h4>
+                <h4 className="font-semibold text-green-800">Dados Extraídos dos PDFs</h4>
                 <p className="text-sm text-green-600">
                   {extractedItems.length} itens encontrados • Revise antes de confirmar
                 </p>
@@ -246,7 +281,7 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
             <Input
               placeholder="Buscar por código ou descrição..."
               value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1"
             />
             <div className="flex gap-2">
@@ -311,7 +346,7 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
                       className={cn(
                         'border-t transition-colors',
                         index % 2 === 0 ? 'bg-card' : 'bg-muted/30',
-                        editingId === item.id && 'bg-primary-light/50'
+                        editingId === item.id && 'bg-primary-light/50',
                       )}
                     >
                       <td className="p-3 text-sm text-muted-foreground">{item.ordem}</td>
@@ -319,7 +354,7 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
                         {editingId === item.id ? (
                           <Input
                             value={item.id_lote}
-                            onChange={e => updateItem(item.id, 'id_lote', e.target.value)}
+                            onChange={(e) => updateItem(item.id, 'id_lote', e.target.value)}
                             className="h-8 w-full text-sm"
                           />
                         ) : (
@@ -330,18 +365,20 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
                         {editingId === item.id ? (
                           <Input
                             value={item.local}
-                            onChange={e => updateItem(item.id, 'local', e.target.value)}
+                            onChange={(e) => updateItem(item.id, 'local', e.target.value)}
                             className="h-8 w-full text-sm"
                           />
                         ) : (
-                          <span className="text-sm font-medium text-amber-600">{item.local || '-'}</span>
+                          <span className="text-sm font-medium text-amber-600">
+                            {item.local || '-'}
+                          </span>
                         )}
                       </td>
                       <td className="p-3">
                         {editingId === item.id ? (
                           <Input
                             value={item.codigo_produto}
-                            onChange={e => updateItem(item.id, 'codigo_produto', e.target.value)}
+                            onChange={(e) => updateItem(item.id, 'codigo_produto', e.target.value)}
                             className="h-8 w-full text-sm"
                           />
                         ) : (
@@ -354,7 +391,9 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
                             type="number"
                             step="0.01"
                             value={item.quantidade}
-                            onChange={e => updateItem(item.id, 'quantidade', parseFloat(e.target.value) || 0)}
+                            onChange={(e) =>
+                              updateItem(item.id, 'quantidade', parseFloat(e.target.value) || 0)
+                            }
                             className="h-8 w-20 text-sm text-right"
                           />
                         ) : (
@@ -365,7 +404,7 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
                         {editingId === item.id ? (
                           <Input
                             value={item.descricao}
-                            onChange={e => updateItem(item.id, 'descricao', e.target.value)}
+                            onChange={(e) => updateItem(item.id, 'descricao', e.target.value)}
                             className="h-8 w-full text-sm"
                           />
                         ) : (
@@ -376,7 +415,7 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
                         {editingId === item.id ? (
                           <Input
                             value={item.marca}
-                            onChange={e => updateItem(item.id, 'marca', e.target.value)}
+                            onChange={(e) => updateItem(item.id, 'marca', e.target.value)}
                             className="h-8 w-full text-sm"
                           />
                         ) : (
@@ -389,10 +428,10 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
                             type="button"
                             onClick={() => setEditingId(editingId === item.id ? null : item.id)}
                             className={cn(
-                              "p-1.5 rounded transition-colors",
+                              'p-1.5 rounded transition-colors',
                               editingId === item.id
-                                ? "bg-primary text-primary-foreground"
-                                : "text-primary hover:bg-primary-light"
+                                ? 'bg-primary text-primary-foreground'
+                                : 'text-primary hover:bg-primary-light',
                             )}
                           >
                             <Pencil className="w-4 h-4" />
@@ -453,5 +492,5 @@ export function PdfExtractorUploader({ onItemsExtracted, existingItems = [], onF
         </div>
       )}
     </div>
-  );
+  )
 }
