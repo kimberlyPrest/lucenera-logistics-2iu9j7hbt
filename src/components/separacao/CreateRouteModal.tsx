@@ -1,13 +1,15 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-export function SolvePendenciaModal({ isOpen, onClose, pendencia, onSuccess }: any) {
+export function CreateRouteModal({ isOpen, onClose, date, deliveries }: any) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Resolver Pendência</DialogTitle>
+          <DialogTitle>Criar Rota</DialogTitle>
         </DialogHeader>
         <div className="py-4">
-          <p>Formulário de resolução.</p>
+          <p className="text-sm text-muted-foreground">
+            Gerenciamento de rotas em desenvolvimento.
+          </p>
         </div>
       </DialogContent>
     </Dialog>

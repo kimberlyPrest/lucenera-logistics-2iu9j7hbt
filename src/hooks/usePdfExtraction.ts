@@ -60,9 +60,7 @@ function rowToText(row: TextItem[]): string {
 }
 
 /** Detect known column headers and return their X positions, including Qtde if present */
-function detectHeaderColumns(
-  rows: TextItem[][],
-): {
+function detectHeaderColumns(rows: TextItem[][]): {
   headerRowIdx: number
   columns: Record<string, number>
   qtdeX?: number
