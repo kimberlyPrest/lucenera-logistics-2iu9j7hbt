@@ -1,14 +1,18 @@
-/* Main App Component - Handles routing (using react-router-dom), query client and other providers - use this file to add all routes */
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import Index from './pages/Index'
-import NotFound from './pages/NotFound'
 import Layout from './components/Layout'
 
-// ONLY IMPORT AND RENDER WORKING PAGES, NEVER ADD PLACEHOLDER COMPONENTS OR PAGES IN THIS FILE
-// AVOID REMOVING ANY CONTEXT PROVIDERS FROM THIS FILE (e.g. TooltipProvider, Toaster, Sonner)
+import Login from './pages/Login'
+import Index from './pages/Index'
+import Calendario from './pages/Calendario'
+import Pendentes from './pages/Pendentes'
+import Separacao from './pages/Separacao'
+import RegistrarEntrega from './pages/RegistrarEntrega'
+import RouteOptimizer from './pages/RouteOptimizer'
+import EntregasFinalizadas from './pages/EntregasFinalizadas'
+import NotFound from './pages/NotFound'
 
 const App = () => (
   <BrowserRouter future={{ v7_startTransition: false, v7_relativeSplatPath: false }}>
@@ -16,10 +20,18 @@ const App = () => (
       <Toaster />
       <Sonner />
       <Routes>
+        <Route path="/login" element={<Login />} />
+
         <Route element={<Layout />}>
           <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES MUST BE ADDED HERE */}
+          <Route path="/calendario" element={<Calendario />} />
+          <Route path="/pendentes" element={<Pendentes />} />
+          <Route path="/separacao/:id" element={<Separacao />} />
+          <Route path="/registrar-entrega" element={<RegistrarEntrega />} />
+          <Route path="/route-optimizer" element={<RouteOptimizer />} />
+          <Route path="/entregas-finalizadas" element={<EntregasFinalizadas />} />
         </Route>
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </TooltipProvider>
